@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Farm Simulation Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fredoka+One:wght@400&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["Inter", "var(--font-sans)"],
+                    game: ["Fredoka One", "cursive"],
+                    mono: ["var(--font-mono)"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(120 20% 97%);
+            --foreground: hsl(120 15% 9%);
+            --card: hsl(120 25% 96%);
+            --card-foreground: hsl(120 15% 15%);
+            --popover: hsl(120 25% 96%);
+            --popover-foreground: hsl(120 15% 9%);
+            --primary: hsl(142 76% 36%);
+            --primary-foreground: hsl(355 0% 100%);
+            --secondary: hsl(39 77% 49%);
+            --secondary-foreground: hsl(39 10% 9%);
+            --muted: hsl(120 15% 92%);
+            --muted-foreground: hsl(120 10% 45%);
+            --accent: hsl(204 94% 64%);
+            --accent-foreground: hsl(204 10% 9%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 98%);
+            --border: hsl(120 20% 89%);
+            --input: hsl(120 20% 89%);
+            --ring: hsl(142 76% 36%);
+            --radius: 0.75rem;
+            --chart-1: hsl(142 76% 36%);
+            --chart-2: hsl(39 77% 49%);
+            --chart-3: hsl(204 94% 64%);
+            --chart-4: hsl(285 85% 65%);
+            --chart-5: hsl(12 76% 61%);
+        }
+
+        .dark {
+            --background: hsl(158 64% 13%);
+            --foreground: hsl(120 20% 95%);
+            --card: hsl(158 50% 15%);
+            --card-foreground: hsl(120 20% 95%);
+            --popover: hsl(158 50% 15%);
+            --popover-foreground: hsl(120 20% 95%);
+            --primary: hsl(142 86% 28%);
+            --primary-foreground: hsl(355 0% 100%);
+            --secondary: hsl(39 67% 39%);
+            --secondary-foreground: hsl(39 0% 98%);
+            --muted: hsl(158 30% 22%);
+            --muted-foreground: hsl(120 15% 65%);
+            --accent: hsl(204 84% 54%);
+            --accent-foreground: hsl(204 0% 98%);
+            --destructive: hsl(0 74% 50%);
+            --destructive-foreground: hsl(0 0% 98%);
+            --border: hsl(158 30% 22%);
+            --input: hsl(158 30% 22%);
+            --ring: hsl(142 86% 28%);
+        }
+
+        .farm-plot {
+            background: linear-gradient(135deg, hsl(82 84% 67%) 0%, hsl(142 76% 36%) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crop-stage-1 { background: hsl(39 77% 80%); }
+        .crop-stage-2 { background: hsl(82 84% 67%); }
+        .crop-stage-3 { background: hsl(142 76% 46%); }
+        .crop-stage-4 { background: hsl(142 86% 28%); }
+
+        .weather-animation {
+            animation: weatherPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes weatherPulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .market-ticker {
+            animation: scroll 15s linear infinite;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .achievement-badge {
+            transition: all 0.3s ease;
+        }
+
+        .achievement-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);
+        }
+
+        .crop-growth {
+            animation: grow 2s ease-out;
+        }
+
+        @keyframes grow {
+            0% { transform: scale(0) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .floating-panel {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .dark .floating-panel {
+            background: rgba(15, 46, 32, 0.9);
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen font-sans">
+    <!-- @COMPONENT: MainGameInterface [Main farming simulation interface] -->
+    <div class="relative min-h-screen overflow-hidden">
+        
+        <!-- Background Farm Scene -->
+        <!-- A vast green farm landscape with rolling hills and scattered farming equipment -->
+        <div class="absolute inset-0 farm-plot" style="background-image: url('https://images.unsplash.com/photo-1472214103451-9374bd1c798e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&h=1380'); background-size: cover; background-position: center;">
+            <div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+        </div>
+
+        <!-- Top Navigation Bar -->
+        <nav class="relative z-10 p-4 floating-panel">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fas fa-seedling text-primary-foreground text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-game text-xl text-primary" data-mock="true">KrishiQuest</h1>
+                        <p class="text-xs text-muted-foreground" data-mock="true">Level 12 Farmer</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Sustaina-Credits -->
+                    <div class="bg-secondary/20 px-3 py-1 rounded-full flex items-center space-x-2">
+                        <i class="fas fa-coins text-secondary text-sm"></i>
+                        <span class="text-sm font-semibold" data-mock="true">2,485</span>
+                    </div>
+                    <!-- Profile -->
+                    <div class="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-muted-foreground"></i>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Weather Widget (Top Right) -->
+        <div class="absolute top-20 right-4 z-20 floating-panel rounded-xl p-4 w-64">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold text-sm">Today's Weather</h3>
+                <div class="weather-animation">
+                    <i class="fas fa-sun text-secondary text-lg"></i>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-2xl font-bold" data-mock="true">28°C</span>
+                    <span class="text-muted-foreground text-sm" data-mock="true">Sunny</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                    <div class="text-center">
+                        <i class="fas fa-thermometer-half text-accent mb-1"></i>
+                        <div class="text-muted-foreground">Humidity</div>
+                        <div class="font-semibold" data-mock="true">65%</div>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-wind text-accent mb-1"></i>
+                        <div class="text-muted-foreground">Wind</div>
+                        <div class="font-semibold" data-mock="true">12 km/h</div>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-tint text-accent mb-1"></i>
+                        <div class="text-muted-foreground">Rain</div>
+                        <div class="font-semibold" data-mock="true">0%</div>
+                    </div>
+                </div>
+                <!-- Weather recommendation -->
+                <div class="mt-3 p-2 bg-primary/10 rounded-lg">
+                    <p class="text-xs text-primary font-medium" data-mock="true">
+                        <i class="fas fa-lightbulb mr-1"></i>
+                        Perfect day for planting tomatoes!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Suggestions Panel (Left Side) -->
+        <div class="absolute top-32 left-4 z-20 floating-panel rounded-xl p-4 w-80">
+            <div class="flex items-center space-x-2 mb-4">
+                <i class="fas fa-magic text-primary"></i>
+                <h3 class="font-semibold">Daily AI Suggestions</h3>
+            </div>
+            
+            <!-- @MAP: dailySuggestions.map(suggestion => ( -->
+            <div class="space-y-3">
+                <div class="flex items-start space-x-3 p-3 bg-primary/5 rounded-lg">
+                    <div class="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-chart-line text-primary text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-sm" data-mock="true">Market Opportunity</h4>
+                        <p class="text-xs text-muted-foreground" data-mock="true">Lettuce prices up 25% - optimal harvest time!</p>
+                        <button class="text-xs text-primary font-medium mt-1" data-implementation="Should open detailed market analysis">
+                            View Details →
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3 p-3 bg-secondary/5 rounded-lg">
+                    <div class="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-seedling text-secondary text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-sm" data-mock="true">Optimal Planting</h4>
+                        <p class="text-xs text-muted-foreground" data-mock="true">Weather perfect for strawberry seedlings in Plot 3</p>
+                        <button class="text-xs text-secondary font-medium mt-1" data-implementation="Should navigate to Plot 3">
+                            Plant Now →
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3 p-3 bg-accent/5 rounded-lg">
+                    <div class="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-tint text-accent text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-sm" data-mock="true">Water Management</h4>
+                        <p class="text-xs text-muted-foreground" data-mock="true">Reduce watering by 30% - rain expected tomorrow</p>
+                        <button class="text-xs text-accent font-medium mt-1" data-implementation="Should adjust irrigation settings">
+                            Adjust →
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_MAP )) -->
+        </div>
+
+        <!-- Farm Plot Grid (Center) -->
+        <div class="absolute inset-x-0 bottom-32 z-10 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- @MAP: farmPlots.map(plot => ( -->
+                    <!-- Plot 1 - Mature Tomatoes -->
+                    <div class="farm-plot-card bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-border" data-event="click:selectPlot">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" data-mock="true">Plot 1</span>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <span class="text-xs text-muted-foreground" data-mock="true">Harvest Ready</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-gradient-to-br from-red-200 to-red-400 rounded-lg mb-3 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-apple-alt text-3xl text-red-600 crop-growth"></i>
+                            </div>
+                            <div class="absolute top-1 right-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">
+                                95%
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-medium" data-mock="true">Tomatoes</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">Est. ₹4,200/harvest</p>
+                            <button class="w-full bg-primary text-primary-foreground py-1 rounded-md text-xs font-medium" data-implementation="Should trigger harvest action">
+                                Harvest
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Plot 2 - Growing Lettuce -->
+                    <div class="farm-plot-card bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-border" data-event="click:selectPlot">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" data-mock="true">Plot 2</span>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+                                <span class="text-xs text-muted-foreground" data-mock="true">Growing</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-gradient-to-br from-green-200 to-green-400 rounded-lg mb-3 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-leaf text-3xl text-green-600"></i>
+                            </div>
+                            <div class="absolute top-1 right-1 bg-secondary text-secondary-foreground text-xs px-1.5 py-0.5 rounded-full">
+                                67%
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-medium" data-mock="true">Lettuce</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">5 days to harvest</p>
+                            <button class="w-full bg-accent text-accent-foreground py-1 rounded-md text-xs font-medium" data-implementation="Should show care options">
+                                Tend Crop
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Plot 3 - Empty -->
+                    <div class="farm-plot-card bg-card/60 backdrop-blur-sm rounded-xl p-4 border border-dashed border-border" data-event="click:selectPlot">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" data-mock="true">Plot 3</span>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-muted-foreground rounded-full"></div>
+                                <span class="text-xs text-muted-foreground" data-mock="true">Empty</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-gradient-to-br from-amber-100 to-amber-200 rounded-lg mb-3 relative overflow-hidden flex items-center justify-center">
+                            <i class="fas fa-plus text-3xl text-amber-600 opacity-50"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-medium text-muted-foreground" data-mock="true">Available</p>
+                            <p class="text-xs text-accent" data-mock="true">Best for strawberries!</p>
+                            <button class="w-full bg-primary text-primary-foreground py-1 rounded-md text-xs font-medium" data-implementation="Should open crop selection">
+                                Plant Crop
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Plot 4 - Vertical Farm -->
+                    <div class="farm-plot-card bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-border" data-event="click:selectPlot">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" data-mock="true">Vertical Farm</span>
+                            <div class="flex items-center space-x-1">
+                                <div class="w-2 h-2 bg-chart-4 rounded-full"></div>
+                                <span class="text-xs text-muted-foreground" data-mock="true">High-Tech</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-gradient-to-br from-blue-200 to-purple-400 rounded-lg mb-3 relative overflow-hidden">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i class="fas fa-building text-3xl text-blue-600"></i>
+                            </div>
+                            <div class="absolute top-1 right-1 bg-chart-4 text-white text-xs px-1.5 py-0.5 rounded-full">
+                                24/7
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-medium" data-mock="true">Leafy Greens</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">₹15,000/month</p>
+                            <button class="w-full bg-chart-4 text-white py-1 rounded-md text-xs font-medium" data-implementation="Should show vertical farm management">
+                                Manage
+                            </button>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Ticker (Bottom) -->
+        <div class="absolute bottom-16 left-0 right-0 z-10 bg-card/90 backdrop-blur-sm border-t border-border py-2 overflow-hidden">
+            <div class="market-ticker whitespace-nowrap">
+                <span class="inline-flex items-center space-x-8 text-sm">
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-arrow-up text-primary"></i>
+                        <span data-mock="true">Tomatoes ₹45/kg (+12%)</span>
+                    </span>
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-arrow-down text-destructive"></i>
+                        <span data-mock="true">Rice ₹28/kg (-3%)</span>
+                    </span>
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-arrow-up text-primary"></i>
+                        <span data-mock="true">Lettuce ₹65/kg (+25%)</span>
+                    </span>
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-minus text-muted-foreground"></i>
+                        <span data-mock="true">Wheat ₹24/kg (0%)</span>
+                    </span>
+                    <span class="flex items-center space-x-2">
+                        <i class="fas fa-arrow-up text-primary"></i>
+                        <span data-mock="true">Strawberries ₹320/kg (+18%)</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="absolute bottom-0 left-0 right-0 z-20 bg-card/95 backdrop-blur-sm border-t border-border">
+            <div class="grid grid-cols-5">
+                <!-- @MAP: navigationItems.map(item => ( -->
+                <button class="flex flex-col items-center py-3 px-2 text-primary" data-implementation="Should navigate to farm view">
+                    <i class="fas fa-home text-lg mb-1"></i>
+                    <span class="text-xs font-medium" data-mock="true">Farm</span>
+                </button>
+                <button class="flex flex-col items-center py-3 px-2 text-muted-foreground" data-implementation="Should open market dashboard">
+                    <i class="fas fa-chart-line text-lg mb-1"></i>
+                    <span class="text-xs" data-mock="true">Market</span>
+                </button>
+                <button class="flex flex-col items-center py-3 px-2 text-muted-foreground" data-implementation="Should open weather forecast">
+                    <i class="fas fa-cloud-sun text-lg mb-1"></i>
+                    <span class="text-xs" data-mock="true">Weather</span>
+                </button>
+                <button class="flex flex-col items-center py-3 px-2 text-muted-foreground" data-implementation="Should open equipment shop">
+                    <i class="fas fa-tools text-lg mb-1"></i>
+                    <span class="text-xs" data-mock="true">Equipment</span>
+                </button>
+                <button class="flex flex-col items-center py-3 px-2 text-muted-foreground" data-implementation="Should open achievement system">
+                    <i class="fas fa-trophy text-lg mb-1"></i>
+                    <span class="text-xs" data-mock="true">Rewards</span>
+                </button>
+                <!-- @END_MAP )) -->
+            </div>
+        </nav>
+
+        <!-- Achievement Notification (Floating) -->
+        <div class="absolute top-40 right-80 z-30 achievement-badge floating-panel rounded-xl p-4 w-64 border-l-4 border-secondary">
+            <div class="flex items-start space-x-3">
+                <div class="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-medal text-secondary"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold text-sm text-secondary" data-mock="true">Achievement Unlocked!</h4>
+                    <p class="text-xs text-muted-foreground" data-mock="true">Weather Wizard - Made 5 accurate weather-based decisions</p>
+                    <div class="flex items-center space-x-2 mt-2">
+                        <span class="text-xs font-medium text-secondary" data-mock="true">+100 Sustaina-Credits</span>
+                        <i class="fas fa-coins text-secondary text-xs"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equipment Upgrade Notification -->
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 floating-panel rounded-xl p-6 w-80 text-center border-2 border-primary">
+            <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-solar-panel text-primary text-2xl"></i>
+            </div>
+            <h3 class="font-game text-lg text-primary mb-2" data-mock="true">Solar Pump Available!</h3>
+            <p class="text-sm text-muted-foreground mb-4" data-mock="true">
+                You've earned enough Sustaina-Credits for a 40% discount on solar irrigation systems.
+            </p>
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span data-mock="true">Original Price:</span>
+                    <span class="line-through text-muted-foreground" data-mock="true">₹85,000</span>
+                </div>
+                <div class="flex justify-between text-sm font-semibold">
+                    <span data-mock="true">Your Price:</span>
+                    <span class="text-primary" data-mock="true">₹51,000</span>
+                </div>
+                <div class="flex justify-between text-xs text-secondary">
+                    <span data-mock="true">Sustaina-Credits Used:</span>
+                    <span data-mock="true">1,700 credits</span>
+                </div>
+            </div>
+            <div class="flex space-x-2 mt-4">
+                <button class="flex-1 bg-muted text-muted-foreground py-2 rounded-md text-sm" data-implementation="Should close modal">
+                    Later
+                </button>
+                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-md text-sm font-medium" data-implementation="Should process equipment purchase">
+                    Upgrade Now
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: MainGameInterface -->
+
+    <script>
+        (function() {
+            // TODO: Implement game state management, real-time weather updates, and market data fetching
+            
+            // Simulate crop growth animation
+            const cropElements = document.querySelectorAll('.crop-growth');
+            cropElements.forEach(element => {
+                element.addEventListener('animationend', () => {
+                    element.classList.remove('crop-growth');
+                });
+            });
+
+            // Simulate interactive plot selection
+            const plotCards = document.querySelectorAll('.farm-plot-card');
+            plotCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // TODO: Implement plot selection and management interface
+                    console.log('Plot selected:', this);
+                });
+            });
+
+            // Simulate market ticker real-time updates
+            function updateMarketTicker() {
+                // TODO: Fetch real market data and update ticker
+                console.log('Market ticker updated');
+            }
+
+            // Simulate weather data updates
+            function updateWeatherData() {
+                // TODO: Fetch real weather data and update recommendations
+                console.log('Weather data updated');
+            }
+
+            // Initialize periodic updates
+            setInterval(updateMarketTicker, 10000); // Update every 10 seconds
+            setInterval(updateWeatherData, 30000); // Update every 30 seconds
+
+            // TODO: Implement gamification system, achievement tracking, and progress management
+        })();
+    </script>
+</body>
+</html>

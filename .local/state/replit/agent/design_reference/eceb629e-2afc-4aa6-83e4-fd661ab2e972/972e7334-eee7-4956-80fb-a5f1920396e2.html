@@ -1,0 +1,820 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Sustainable Farming Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js" type="module"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                },
+                fontFamily: {
+                    sans: ["Inter", "system-ui", "sans-serif"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(60 54% 97%);
+            --foreground: hsl(24 9% 10%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(24 9% 10%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(24 9% 10%);
+            --primary: hsl(142 76% 36%);
+            --primary-foreground: hsl(355 20% 99%);
+            --secondary: hsl(30 82% 28%);
+            --secondary-foreground: hsl(355 20% 99%);
+            --muted: hsl(60 4% 96%);
+            --muted-foreground: hsl(25 5% 45%);
+            --accent: hsl(45 93% 47%);
+            --accent-foreground: hsl(26 83% 14%);
+            --destructive: hsl(0 72% 51%);
+            --destructive-foreground: hsl(355 20% 99%);
+            --border: hsl(20 13% 91%);
+            --input: hsl(20 13% 91%);
+            --ring: hsl(142 76% 36%);
+            --radius: 8px;
+        }
+        
+        .tab-active {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="font-sans bg-background text-foreground">
+    <!-- @COMPONENT: MobileApp [KrishiQuest main application container] -->
+    <div class="max-w-md mx-auto bg-white min-h-screen relative">
+        
+        <!-- @COMPONENT: AppHeader [Top navigation with credits and profile] -->
+        <header class="bg-card border-b border-border px-4 py-3 sticky top-0 z-50">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-semibold">KrishiQuest</h1>
+                        <p class="text-xs text-muted-foreground" data-bind="user.name">Farmer Raj</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-accent/10 px-3 py-1 rounded-full flex items-center space-x-1">
+                        <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-sm font-medium text-accent-foreground" data-bind="user.credits">2,450</span>
+                    </div>
+                    <button class="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: AppHeader -->
+
+        <!-- @COMPONENT: TabNavigation [Bottom tab navigation] -->
+        <nav class="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-card border-t border-border px-4 py-2 z-50">
+            <div class="flex justify-around">
+                <button data-event="click:switchTab" data-tab="farm" class="tab-active flex flex-col items-center space-y-1 px-3 py-2 rounded-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span class="text-xs">Farm</span>
+                </button>
+                <button data-event="click:switchTab" data-tab="weather" class="flex flex-col items-center space-y-1 px-3 py-2 rounded-md text-muted-foreground hover:text-foreground">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                    </svg>
+                    <span class="text-xs">Weather</span>
+                </button>
+                <button data-event="click:switchTab" data-tab="marketplace" class="flex flex-col items-center space-y-1 px-3 py-2 rounded-md text-muted-foreground hover:text-foreground">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span class="text-xs">Shop</span>
+                </button>
+                <button data-event="click:switchTab" data-tab="wallet" class="flex flex-col items-center space-y-1 px-3 py-2 rounded-md text-muted-foreground hover:text-foreground">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    <span class="text-xs">Wallet</span>
+                </button>
+                <button data-event="click:switchTab" data-tab="quests" class="flex flex-col items-center space-y-1 px-3 py-2 rounded-md text-muted-foreground hover:text-foreground">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    <span class="text-xs">Quests</span>
+                </button>
+            </div>
+        </nav>
+        <!-- @END_COMPONENT: TabNavigation -->
+
+        <!-- @COMPONENT: MainContent [Scrollable content area] -->
+        <main class="px-4 py-6 pb-20 space-y-6">
+            
+            <!-- Farm Tab Content -->
+            <div id="farm-content" class="space-y-6">
+                
+                <!-- Virtual Farm Section -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">My Virtual Farm</h2>
+                        <div class="flex items-center space-x-1 text-sm text-muted-foreground">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <span>Level 7</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Farm Grid -->
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <!-- @MAP: farmPlots.map(plot => ( -->
+                        <div class="aspect-square bg-green-50 border-2 border-green-200 rounded-lg flex items-center justify-center relative">
+                            <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                            </svg>
+                            <div class="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-primary-foreground">3d</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-yellow-50 border-2 border-yellow-200 rounded-lg flex items-center justify-center relative">
+                            <svg class="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
+                                <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="absolute -top-1 -right-1 w-6 h-6 bg-accent rounded-full flex items-center justify-center">
+                                <span class="text-xs font-bold text-accent-foreground">1d</span>
+                            </div>
+                        </div>
+                        <div class="aspect-square bg-muted border-2 border-dashed border-border rounded-lg flex items-center justify-center" data-event="click:plantCrop">
+                            <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-primary text-primary-foreground py-2 px-4 rounded-md text-sm font-medium" data-event="click:waterCrops">
+                            Water Crops (+25 credits)
+                        </button>
+                        <button class="flex-1 bg-secondary text-secondary-foreground py-2 px-4 rounded-md text-sm font-medium" data-event="click:harvestReady">
+                            Harvest Ready
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Today's Tasks -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Today's Sustainable Tasks</h3>
+                    <div class="space-y-3">
+                        <!-- @MAP: dailyTasks.map(task => ( -->
+                        <div class="flex items-center justify-between p-3 bg-muted rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Use drip irrigation</p>
+                                    <p class="text-xs text-muted-foreground">Save 30% more water</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-medium text-accent">+100</span>
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-xs" data-event="click:completeTask">
+                                    Complete
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <div>
+                                    <p class="text-sm font-medium">Check soil moisture</p>
+                                    <p class="text-xs text-muted-foreground">Prevent overwatering</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm font-medium text-green-600">+50</span>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+
+                <!-- Progress Overview -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Weekly Progress</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium">Sustainable Practices</span>
+                                <span class="text-sm text-muted-foreground">7/10</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="progress-bar h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium">Learning Modules</span>
+                                <span class="text-sm text-muted-foreground">3/5</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="progress-bar h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Weather Tab Content -->
+            <div id="weather-content" class="space-y-6 hidden">
+                <!-- Current Weather -->
+                <section class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold">Mumbai, Maharashtra</h2>
+                            <p class="text-blue-100">Today, March 15</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold">28°C</div>
+                            <div class="text-blue-100">Partly Cloudy</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm text-blue-100">
+                        <span>Humidity: 65%</span>
+                        <span>Wind: 12 km/h</span>
+                        <span>UV: 6</span>
+                    </div>
+                </section>
+
+                <!-- Farming Recommendations -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Smart Farming Suggestions</h3>
+                    <div class="space-y-3">
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-green-800">Perfect time for watering!</h4>
+                                    <p class="text-sm text-green-600 mb-2">Low wind and moderate humidity make this ideal for irrigation.</p>
+                                    <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-xs" data-event="click:followSuggestion">
+                                        Follow (+25 credits)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-yellow-800">High UV alert</h4>
+                                    <p class="text-sm text-yellow-600 mb-2">Consider shade nets for sensitive crops today.</p>
+                                    <button class="bg-accent text-accent-foreground px-3 py-1 rounded text-xs" data-event="click:followSuggestion">
+                                        Apply (+15 credits)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7-Day Forecast -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">7-Day Forecast</h3>
+                    <div class="space-y-2">
+                        <!-- @MAP: forecast.map(day => ( -->
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-sm font-medium">Tomorrow</span>
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm">29°C</span>
+                                <span class="text-sm text-muted-foreground">22°C</span>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Marketplace Tab Content -->
+            <div id="marketplace-content" class="space-y-6 hidden">
+                <!-- Featured Deals -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Featured Equipment Deals</h3>
+                    <div class="space-y-4">
+                        <!-- @MAP: featuredDeals.map(deal => ( -->
+                        <div class="border border-border rounded-lg p-4 bg-gradient-to-r from-green-50 to-blue-50">
+                            <!-- High-quality drip irrigation system installed in a modern greenhouse -->
+                            <img src="https://images.unsplash.com/photo-1586771107445-d3ca888129ff?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=400" alt="Drip irrigation system" class="w-full h-32 object-cover rounded-lg mb-3" />
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-semibold">Solar Water Pump Kit</h4>
+                                    <p class="text-sm text-muted-foreground">Complete irrigation solution</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-destructive line-through">₹85,000</div>
+                                    <div class="text-xl font-bold text-primary">₹76,500</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="bg-destructive text-destructive-foreground px-2 py-1 rounded text-xs">10% OFF</span>
+                                    <span class="text-sm text-muted-foreground">with 1000 credits</span>
+                                </div>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium" data-event="click:redeemDiscount">
+                                    Redeem Discount
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+
+                <!-- Equipment Categories -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Shop by Category</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-muted rounded-lg p-4 text-center card-hover" data-event="click:browseCategory">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium">Solar Equipment</span>
+                        </div>
+                        <div class="bg-muted rounded-lg p-4 text-center card-hover" data-event="click:browseCategory">
+                            <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-secondary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium">Seeds & Plants</span>
+                        </div>
+                        <div class="bg-muted rounded-lg p-4 text-center card-hover" data-event="click:browseCategory">
+                            <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-accent-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium">Tools</span>
+                        </div>
+                        <div class="bg-muted rounded-lg p-4 text-center card-hover" data-event="click:browseCategory">
+                            <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium">Organic Inputs</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Partner Vendors -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Trusted Partners</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="border border-border rounded-lg p-3 text-center">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-blue-600 font-bold text-lg">TS</span>
+                            </div>
+                            <h4 class="font-medium text-sm">Tata Solar</h4>
+                            <p class="text-xs text-muted-foreground">Solar Solutions</p>
+                            <div class="flex items-center justify-center mt-2">
+                                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">15% OFF</span>
+                            </div>
+                        </div>
+                        <div class="border border-border rounded-lg p-3 text-center">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="text-green-600 font-bold text-lg">MA</span>
+                            </div>
+                            <h4 class="font-medium text-sm">Mahindra Agri</h4>
+                            <p class="text-xs text-muted-foreground">Farm Equipment</p>
+                            <div class="flex items-center justify-center mt-2">
+                                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">20% OFF</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Wallet Tab Content -->
+            <div id="wallet-content" class="space-y-6 hidden">
+                <!-- Credit Balance -->
+                <section class="bg-gradient-to-r from-primary to-accent rounded-lg p-6 text-white card-hover">
+                    <div class="text-center">
+                        <h2 class="text-lg font-medium mb-2">Sustaina-Credits Balance</h2>
+                        <div class="text-4xl font-bold mb-2" data-bind="user.credits">2,450</div>
+                        <p class="text-primary-foreground/80">≈ ₹2,450 in savings</p>
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button class="bg-white/20 backdrop-blur-sm text-white px-6 py-2 rounded-md text-sm font-medium" data-event="click:inviteFriend">
+                            Invite Friend (+200 credits)
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg card-hover" data-event="click:redeemCredits">
+                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                            <span class="text-sm font-medium">Redeem Credits</span>
+                        </button>
+                        <button class="flex flex-col items-center space-y-2 p-4 bg-muted rounded-lg card-hover" data-event="click:earnMore">
+                            <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            <span class="text-sm font-medium">Earn More</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Transaction History -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Recent Transactions</h3>
+                    <div class="space-y-3">
+                        <!-- @MAP: transactions.map(transaction => ( -->
+                        <div class="flex items-center justify-between p-3 border border-border rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Completed sustainable task</p>
+                                    <p class="text-xs text-muted-foreground">Water conservation</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-green-600">+100</div>
+                                <div class="text-xs text-muted-foreground">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 border border-border rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Followed weather suggestion</p>
+                                    <p class="text-xs text-muted-foreground">Optimal irrigation timing</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-green-600">+25</div>
+                                <div class="text-xs text-muted-foreground">5 hours ago</div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+
+                <!-- Redemption Guide -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Credit Redemption Guide</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium">Solar Pumps</p>
+                                <p class="text-xs text-muted-foreground">1000 credits = 10% discount</p>
+                            </div>
+                            <div class="text-sm font-medium text-green-600">Save ₹8,500+</div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium">Quality Seeds</p>
+                                <p class="text-xs text-muted-foreground">500 credits = 15% discount</p>
+                            </div>
+                            <div class="text-sm font-medium text-blue-600">Save ₹750+</div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <div>
+                                <p class="text-sm font-medium">Farm Tools</p>
+                                <p class="text-xs text-muted-foreground">750 credits = 20% discount</p>
+                            </div>
+                            <div class="text-sm font-medium text-yellow-600">Save ₹2,000+</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Quests Tab Content -->
+            <div id="quests-content" class="space-y-6 hidden">
+                <!-- Current Quest -->
+                <section class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 text-white card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold">Weekly Challenge</h2>
+                            <p class="text-purple-100">Water Conservation Master</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold">5/7</div>
+                            <div class="text-purple-100">Days completed</div>
+                        </div>
+                    </div>
+                    <div class="w-full bg-white/20 rounded-full h-2 mb-4">
+                        <div class="bg-white h-2 rounded-full" style="width: 71%"></div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold mb-1">+500</div>
+                        <div class="text-purple-100">Credits on completion</div>
+                    </div>
+                </section>
+
+                <!-- Available Quests -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Learning Quests</h3>
+                    <div class="space-y-3">
+                        <!-- @MAP: availableQuests.map(quest => ( -->
+                        <div class="border border-border rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold">Vertical Farming Basics</h4>
+                                    <p class="text-sm text-muted-foreground">Learn the fundamentals of vertical farming</p>
+                                </div>
+                                <div class="flex items-center space-x-1 text-accent">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="text-sm font-medium">+150</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 text-sm text-muted-foreground">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>15 minutes</span>
+                                </div>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium" data-event="click:startQuest">
+                                    Start Quest
+                                </button>
+                            </div>
+                        </div>
+                        <div class="border border-border rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold">Drip Irrigation Setup</h4>
+                                    <p class="text-sm text-muted-foreground">Master water-efficient irrigation</p>
+                                </div>
+                                <div class="flex items-center space-x-1 text-accent">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="text-sm font-medium">+200</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 text-sm text-muted-foreground">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span>20 minutes</span>
+                                </div>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium" data-event="click:startQuest">
+                                    Start Quest
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+
+                <!-- Achievements -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Achievements</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- @MAP: achievements.map(achievement => ( -->
+                        <div class="border border-border rounded-lg p-3 text-center">
+                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-medium">Water Saver</h4>
+                            <p class="text-xs text-muted-foreground">Completed 10 water tasks</p>
+                            <div class="mt-2">
+                                <span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">+300 credits</span>
+                            </div>
+                        </div>
+                        <div class="border border-border rounded-lg p-3 text-center opacity-50">
+                            <div class="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-2">
+                                <svg class="w-6 h-6 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            <h4 class="text-sm font-medium">Solar Pioneer</h4>
+                            <p class="text-xs text-muted-foreground">Install solar equipment</p>
+                            <div class="mt-2">
+                                <span class="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">Locked</span>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+
+                <!-- Leaderboard -->
+                <section class="bg-card rounded-lg border border-border p-4 card-hover">
+                    <h3 class="text-lg font-semibold mb-4">Community Leaderboard</h3>
+                    <div class="space-y-3">
+                        <!-- @MAP: leaderboard.map((farmer, index) => ( -->
+                        <div class="flex items-center justify-between p-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                                    <span class="text-sm font-bold text-accent-foreground">1</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Farmer Kumar</p>
+                                    <p class="text-xs text-muted-foreground">Level 15 • Maharashtra</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold">5,240</div>
+                                <div class="text-xs text-muted-foreground">credits</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-2">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                                    <span class="text-sm font-bold text-muted-foreground">2</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">Farmer Singh</p>
+                                    <p class="text-xs text-muted-foreground">Level 12 • Punjab</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold">4,890</div>
+                                <div class="text-xs text-muted-foreground">credits</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-primary/10 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                    <span class="text-sm font-bold text-primary-foreground">7</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium">You (Farmer Raj)</p>
+                                    <p class="text-xs text-muted-foreground">Level 7 • Gujarat</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold">2,450</div>
+                                <div class="text-xs text-muted-foreground">credits</div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </section>
+            </div>
+
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+
+    </div>
+    <!-- @END_COMPONENT: MobileApp -->
+
+    <script>
+        // TODO: Implement tab switching functionality
+        (function() {
+            const tabs = document.querySelectorAll('[data-tab]');
+            const contents = {
+                farm: document.getElementById('farm-content'),
+                weather: document.getElementById('weather-content'),
+                marketplace: document.getElementById('marketplace-content'),
+                wallet: document.getElementById('wallet-content'),
+                quests: document.getElementById('quests-content')
+            };
+
+            function switchTab(tabName) {
+                // Remove active class from all tabs
+                tabs.forEach(tab => {
+                    tab.classList.remove('tab-active');
+                    tab.classList.add('text-muted-foreground', 'hover:text-foreground');
+                });
+
+                // Hide all content
+                Object.values(contents).forEach(content => {
+                    if (content) content.classList.add('hidden');
+                });
+
+                // Show selected content
+                if (contents[tabName]) {
+                    contents[tabName].classList.remove('hidden');
+                }
+
+                // Activate selected tab
+                const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+                if (activeTab) {
+                    activeTab.classList.add('tab-active');
+                    activeTab.classList.remove('text-muted-foreground', 'hover:text-foreground');
+                }
+            }
+
+            // Add event listeners
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Initialize with farm tab
+            switchTab('farm');
+        })();
+
+        // TODO: Implement farming action handlers
+        // TODO: Implement credit earning system
+        // TODO: Implement equipment discount redemption
+        // TODO: Implement quest system
+        // TODO: Implement weather suggestion following
+        // TODO: Implement achievement tracking
+        // TODO: Implement real vendor integration
+    </script>
+</body>
+</html>

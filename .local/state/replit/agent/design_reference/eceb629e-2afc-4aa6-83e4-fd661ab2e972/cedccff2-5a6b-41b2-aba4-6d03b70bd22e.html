@@ -1,0 +1,794 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Sustainable Farming Revolution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                    serif: ["var(--font-serif)"],
+                    mono: ["var(--font-mono)"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(120 25% 98%);
+            --foreground: hsl(120 10% 15%);
+            --card: hsl(120 25% 100%);
+            --card-foreground: hsl(120 10% 15%);
+            --popover: hsl(120 25% 100%);
+            --popover-foreground: hsl(120 10% 15%);
+            --primary: hsl(142 76% 36%);
+            --primary-foreground: hsl(0 0% 98%);
+            --secondary: hsl(45 93% 47%);
+            --secondary-foreground: hsl(26 83% 14%);
+            --muted: hsl(142 30% 94%);
+            --muted-foreground: hsl(142 10% 45%);
+            --accent: hsl(45 93% 47%);
+            --accent-foreground: hsl(26 83% 14%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 98%);
+            --border: hsl(142 30% 88%);
+            --input: hsl(142 30% 88%);
+            --ring: hsl(142 76% 36%);
+            --radius: 0.75rem;
+            --font-sans: 'Inter', system-ui, sans-serif;
+        }
+
+        .dark {
+            --background: hsl(120 20% 8%);
+            --foreground: hsl(120 5% 90%);
+            --card: hsl(120 20% 10%);
+            --card-foreground: hsl(120 5% 90%);
+            --popover: hsl(120 20% 10%);
+            --popover-foreground: hsl(120 5% 90%);
+            --primary: hsl(142 70% 45%);
+            --primary-foreground: hsl(120 20% 8%);
+            --secondary: hsl(45 85% 55%);
+            --secondary-foreground: hsl(120 20% 8%);
+            --muted: hsl(120 20% 14%);
+            --muted-foreground: hsl(120 5% 60%);
+            --accent: hsl(45 85% 55%);
+            --accent-foreground: hsl(120 20% 8%);
+            --destructive: hsl(0 75% 55%);
+            --destructive-foreground: hsl(120 5% 90%);
+            --border: hsl(120 20% 18%);
+            --input: hsl(120 20% 18%);
+            --ring: hsl(142 70% 45%);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring circle {
+            transition: stroke-dashoffset 0.3s ease-in-out;
+        }
+        
+        .quest-card {
+            background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .quest-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px hsl(var(--primary) / 0.15);
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--secondary)) 100%);
+        }
+
+        .nav-tab.active {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-background text-foreground">
+    <!-- @COMPONENT: AppContainer [Main app wrapper] -->
+    <div class="min-h-screen">
+        <!-- @COMPONENT: Header [Top navigation with profile and notifications] -->
+        <header class="bg-card border-b border-border p-4 sticky top-0 z-50">
+            <div class="flex items-center justify-between max-w-md mx-auto">
+                <div class="flex items-center space-x-3">
+                    <!-- Circular farmer profile image -->
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                        <i class="fas fa-user text-primary-foreground text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium" data-bind="user.name" data-mock="true">Rajesh Kumar</p>
+                        <p class="text-xs text-muted-foreground">Level 12 Farmer</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <!-- Sustaina-Credits Display -->
+                    <div class="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full">
+                        <i class="fas fa-coins text-accent text-sm"></i>
+                        <span class="text-sm font-semibold text-accent-foreground" data-bind="user.sustainaCredits" data-mock="true">2,450</span>
+                    </div>
+                    <button class="p-2 rounded-full hover:bg-muted">
+                        <i class="fas fa-bell text-muted-foreground text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: Header -->
+
+        <!-- @COMPONENT: MainContent [Primary content area with tabs] -->
+        <main class="max-w-md mx-auto pb-20">
+            <!-- @COMPONENT: ProgressOverview [Daily progress and streak] -->
+            <section class="p-4 bg-gradient-to-br from-primary/10 to-accent/10">
+                <div class="bg-card/80 backdrop-blur-sm rounded-lg p-4 border border-border/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold">Today's Progress</h2>
+                        <div class="flex items-center space-x-1 text-accent">
+                            <i class="fas fa-fire text-sm"></i>
+                            <span class="text-sm font-medium">7 Day Streak</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <!-- Quests Completed -->
+                        <div class="text-center">
+                            <div class="relative w-16 h-16 mx-auto mb-2">
+                                <svg class="progress-ring w-16 h-16" viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--muted))" stroke-width="2"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--primary))" stroke-width="2" 
+                                            stroke-dasharray="75 25" stroke-dashoffset="0"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-sm font-semibold">3/4</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-muted-foreground">Quests</p>
+                        </div>
+
+                        <!-- Learning Time -->
+                        <div class="text-center">
+                            <div class="relative w-16 h-16 mx-auto mb-2">
+                                <svg class="progress-ring w-16 h-16" viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--muted))" stroke-width="2"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--accent))" stroke-width="2" 
+                                            stroke-dasharray="60 40" stroke-dashoffset="0"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xs font-semibold">36m</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-muted-foreground">Learning</p>
+                        </div>
+
+                        <!-- Credits Earned -->
+                        <div class="text-center">
+                            <div class="relative w-16 h-16 mx-auto mb-2">
+                                <svg class="progress-ring w-16 h-16" viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--muted))" stroke-width="2"/>
+                                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="hsl(var(--secondary))" stroke-width="2" 
+                                            stroke-dasharray="85 15" stroke-dashoffset="0"/>
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xs font-semibold">170</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-muted-foreground">Credits</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- @END_COMPONENT: ProgressOverview -->
+
+            <!-- @COMPONENT: TabNavigation [Main navigation tabs] -->
+            <nav class="sticky top-16 z-40 bg-background/95 backdrop-blur-sm border-b border-border">
+                <div class="flex">
+                    <button class="nav-tab active flex-1 py-3 text-sm font-medium" data-tab="quests">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Quests
+                    </button>
+                    <button class="nav-tab flex-1 py-3 text-sm font-medium text-muted-foreground" data-tab="learn">
+                        <i class="fas fa-graduation-cap mr-2"></i>Learn
+                    </button>
+                    <button class="nav-tab flex-1 py-3 text-sm font-medium text-muted-foreground" data-tab="rewards">
+                        <i class="fas fa-gift mr-2"></i>Rewards
+                    </button>
+                    <button class="nav-tab flex-1 py-3 text-sm font-medium text-muted-foreground" data-tab="community">
+                        <i class="fas fa-users mr-2"></i>Community
+                    </button>
+                </div>
+            </nav>
+            <!-- @END_COMPONENT: TabNavigation -->
+
+            <!-- @COMPONENT: QuestsTab [Active quest content] -->
+            <div id="quests-content" class="tab-content">
+                <!-- Featured Quest -->
+                <section class="p-4">
+                    <h3 class="text-lg font-semibold mb-4">Featured Quest</h3>
+                    <div class="quest-card p-4 rounded-lg border border-border mb-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-primary">Master Vertical Farming</h4>
+                                <p class="text-sm text-muted-foreground mt-1">Learn advanced techniques for maximizing crop yield in vertical systems</p>
+                            </div>
+                            <div class="achievement-badge w-12 h-12 rounded-full flex items-center justify-center ml-3">
+                                <i class="fas fa-seedling text-accent-foreground text-lg"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-muted-foreground">Progress</span>
+                                <span class="font-medium">2/4 modules</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 50%"></div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 text-sm text-muted-foreground">
+                                    <i class="fas fa-clock"></i>
+                                    <span>25 min remaining</span>
+                                </div>
+                                <div class="flex items-center space-x-1 text-sm font-medium text-accent">
+                                    <i class="fas fa-coins"></i>
+                                    <span>+300 Credits</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Daily Quests -->
+                <section class="px-4 pb-4">
+                    <h3 class="text-lg font-semibold mb-4">Daily Quests</h3>
+                    <!-- @MAP: dailyQuests.map(quest => ( -->
+                    <div class="space-y-3">
+                        <div class="quest-card p-4 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-tint text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium" data-mock="true">Water Conservation Quiz</h4>
+                                        <p class="text-sm text-muted-foreground">Test your knowledge of efficient irrigation</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-accent">+50</div>
+                                    <button class="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full mt-1">
+                                        Start
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quest-card p-4 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-solar-panel text-accent"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium" data-mock="true">Solar Setup Simulation</h4>
+                                        <p class="text-sm text-muted-foreground">Design an optimal solar farm layout</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-accent">+100</div>
+                                    <button class="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full mt-1">
+                                        Start
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quest-card p-4 rounded-lg border border-border opacity-60">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                                        <i class="fas fa-check text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium" data-mock="true">ROI Calculator Practice</h4>
+                                        <p class="text-sm text-muted-foreground">Compare traditional vs vertical farming profits</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm font-medium text-primary">✓ Complete</div>
+                                    <div class="text-xs text-muted-foreground">+75 earned</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                </section>
+            </div>
+            <!-- @END_COMPONENT: QuestsTab -->
+
+            <!-- @COMPONENT: LearnTab [Educational content] -->
+            <div id="learn-content" class="tab-content hidden">
+                <section class="p-4">
+                    <h3 class="text-lg font-semibold mb-4">Learning Modules</h3>
+                    
+                    <!-- Course Categories -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="bg-gradient-to-br from-primary/20 to-primary/10 p-4 rounded-lg border border-primary/20">
+                            <i class="fas fa-building text-primary text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-sm">Vertical Farming</h4>
+                            <p class="text-xs text-muted-foreground">12 modules</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-accent/20 to-accent/10 p-4 rounded-lg border border-accent/20">
+                            <i class="fas fa-seedling text-accent text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-sm">Hydroponics</h4>
+                            <p class="text-xs text-muted-foreground">8 modules</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-blue-500/20 to-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+                            <i class="fas fa-fish text-blue-500 text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-sm">Aquaponics</h4>
+                            <p class="text-xs text-muted-foreground">6 modules</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-500/20 to-yellow-500/10 p-4 rounded-lg border border-yellow-500/20">
+                            <i class="fas fa-sun text-yellow-500 text-2xl mb-2"></i>
+                            <h4 class="font-semibold text-sm">Solar Integration</h4>
+                            <p class="text-xs text-muted-foreground">5 modules</p>
+                        </div>
+                    </div>
+
+                    <!-- Current Course Progress -->
+                    <div class="bg-card p-4 rounded-lg border border-border mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold">Current: Lettuce Production Mastery</h4>
+                            <span class="text-sm text-accent font-medium">Level 3</span>
+                        </div>
+                        
+                        <!-- Course image showcasing vertical lettuce farming -->
+                        <div class="aspect-video mb-3 rounded-lg overflow-hidden">
+                            <!-- Vertical hydroponic lettuce growing system in a controlled environment facility -->
+                            <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=450" 
+                                 alt="Vertical hydroponic lettuce growing system" 
+                                 class="w-full h-full object-cover" data-mock-image="true" />
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-muted-foreground">Module Progress</span>
+                                <span class="font-medium">7/10 completed</span>
+                            </div>
+                            <div class="w-full bg-muted rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium mt-3">
+                                Continue Learning
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ROI Calculator Section -->
+                    <div class="bg-gradient-to-br from-accent/10 to-secondary/10 p-4 rounded-lg border border-accent/20">
+                        <h4 class="font-semibold mb-3 flex items-center">
+                            <i class="fas fa-calculator text-accent mr-2"></i>
+                            ROI Calculator
+                        </h4>
+                        <p class="text-sm text-muted-foreground mb-3">Compare profits: Traditional rice vs. Vertical lettuce farming</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div class="bg-card p-3 rounded border">
+                                <p class="text-xs text-muted-foreground">Traditional Rice</p>
+                                <p class="font-bold text-lg" data-mock="true">₹60,000</p>
+                                <p class="text-xs text-muted-foreground">per acre/year</p>
+                            </div>
+                            <div class="bg-card p-3 rounded border">
+                                <p class="text-xs text-muted-foreground">Vertical Lettuce</p>
+                                <p class="font-bold text-lg text-primary" data-mock="true">₹22,00,000</p>
+                                <p class="text-xs text-muted-foreground">per acre/year</p>
+                            </div>
+                        </div>
+                        
+                        <button class="w-full bg-accent text-accent-foreground py-2 rounded-lg font-medium">
+                            Try Calculator
+                        </button>
+                    </div>
+                </section>
+            </div>
+            <!-- @END_COMPONENT: LearnTab -->
+
+            <!-- @COMPONENT: RewardsTab [Marketplace and rewards] -->
+            <div id="rewards-content" class="tab-content hidden">
+                <section class="p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Equipment Marketplace</h3>
+                        <div class="flex items-center space-x-1 bg-accent/20 px-3 py-1 rounded-full">
+                            <i class="fas fa-coins text-accent text-sm"></i>
+                            <span class="text-sm font-semibold text-accent-foreground" data-bind="user.sustainaCredits" data-mock="true">2,450</span>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Cards -->
+                    <div class="space-y-4">
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <!-- Solar pump equipment image -->
+                                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200" 
+                                         alt="Solar water pump system for irrigation" 
+                                         class="w-full h-full object-cover" data-mock-image="true" />
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold" data-mock="true">Solar Water Pump</h4>
+                                    <p class="text-sm text-muted-foreground">5HP submersible solar pump with controller</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div>
+                                            <span class="text-sm line-through text-muted-foreground">₹45,000</span>
+                                            <span class="font-bold text-primary ml-2">₹38,250</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xs text-accent font-medium">Save 1,500 credits</div>
+                                            <button class="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full mt-1">
+                                                Redeem
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <!-- Vertical farming setup image -->
+                                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200" 
+                                         alt="Indoor vertical farming tower system" 
+                                         class="w-full h-full object-cover" data-mock-image="true" />
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold" data-mock="true">Vertical Farm Kit</h4>
+                                    <p class="text-sm text-muted-foreground">Complete 6-tier growing system with LED lights</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div>
+                                            <span class="text-sm line-through text-muted-foreground">₹75,000</span>
+                                            <span class="font-bold text-primary ml-2">₹60,000</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xs text-accent font-medium">Save 3,000 credits</div>
+                                            <button class="text-xs bg-muted text-muted-foreground px-3 py-1 rounded-full mt-1" disabled>
+                                                Need 550 more
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <!-- Hydroponic nutrients image -->
+                                <div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1416879595882-3373a0480b5b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=200&h=200" 
+                                         alt="Hydroponic nutrient solution bottles" 
+                                         class="w-full h-full object-cover" data-mock-image="true" />
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-semibold" data-mock="true">Hydroponic Nutrients</h4>
+                                    <p class="text-sm text-muted-foreground">Complete nutrient solution set for 6 months</p>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <div>
+                                            <span class="text-sm line-through text-muted-foreground">₹8,500</span>
+                                            <span class="font-bold text-primary ml-2">₹7,650</span>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-xs text-accent font-medium">Save 500 credits</div>
+                                            <button class="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full mt-1">
+                                                Redeem
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Achievement Showcase -->
+                    <div class="mt-6">
+                        <h4 class="font-semibold mb-3">Recent Achievements</h4>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="text-center">
+                                <div class="achievement-badge w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-seedling text-accent-foreground text-xl"></i>
+                                </div>
+                                <p class="text-xs font-medium">Green Thumb</p>
+                                <p class="text-xs text-muted-foreground">+200 credits</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="achievement-badge w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-lightbulb text-accent-foreground text-xl"></i>
+                                </div>
+                                <p class="text-xs font-medium">Knowledge Seeker</p>
+                                <p class="text-xs text-muted-foreground">+150 credits</p>
+                            </div>
+                            <div class="text-center opacity-50">
+                                <div class="w-16 h-16 rounded-full border-2 border-dashed border-muted flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-lock text-muted-foreground text-xl"></i>
+                                </div>
+                                <p class="text-xs font-medium">Eco Master</p>
+                                <p class="text-xs text-muted-foreground">Locked</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- @END_COMPONENT: RewardsTab -->
+
+            <!-- @COMPONENT: CommunityTab [Social features] -->
+            <div id="community-content" class="tab-content hidden">
+                <section class="p-4">
+                    <h3 class="text-lg font-semibold mb-4">Farmer Community</h3>
+                    
+                    <!-- Community Stats -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="bg-card p-3 rounded-lg border border-border text-center">
+                            <div class="text-lg font-bold text-primary" data-mock="true">12,847</div>
+                            <div class="text-xs text-muted-foreground">Active Farmers</div>
+                        </div>
+                        <div class="bg-card p-3 rounded-lg border border-border text-center">
+                            <div class="text-lg font-bold text-accent" data-mock="true">856</div>
+                            <div class="text-xs text-muted-foreground">Questions Answered</div>
+                        </div>
+                        <div class="bg-card p-3 rounded-lg border border-border text-center">
+                            <div class="text-lg font-bold text-secondary" data-mock="true">43</div>
+                            <div class="text-xs text-muted-foreground">Your Rank</div>
+                        </div>
+                    </div>
+
+                    <!-- Discussion Topics -->
+                    <div class="space-y-4">
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                                    <span class="text-primary-foreground text-sm font-medium" data-mock="true">AR</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <h4 class="font-medium text-sm" data-mock="true">Arjun Patel</h4>
+                                        <span class="text-xs text-muted-foreground">2h ago</span>
+                                    </div>
+                                    <p class="text-sm mb-2" data-mock="true">Has anyone tried strawberry cultivation in vertical farms? Looking for tips on nutrient mixing ratios.</p>
+                                    <div class="flex items-center space-x-4 text-xs text-muted-foreground">
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span data-mock="true">12</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-comment"></i>
+                                            <span data-mock="true">5 replies</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-accent">
+                                            <i class="fas fa-share"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
+                                    <span class="text-accent-foreground text-sm font-medium" data-mock="true">PS</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <h4 class="font-medium text-sm" data-mock="true">Priya Sharma</h4>
+                                        <span class="text-xs text-muted-foreground">4h ago</span>
+                                        <span class="bg-primary/20 text-primary text-xs px-2 py-0.5 rounded-full">Expert</span>
+                                    </div>
+                                    <p class="text-sm mb-2" data-mock="true">Successfully completed my first solar-powered hydroponic setup! 40% increase in yield compared to traditional methods. Happy to answer questions.</p>
+                                    
+                                    <!-- Success story image of hydroponic farm setup -->
+                                    <div class="aspect-video mb-2 rounded-lg overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=450" 
+                                             alt="Modern hydroponic greenhouse with flourishing green vegetables" 
+                                             class="w-full h-full object-cover" data-mock-image="true" />
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-4 text-xs text-muted-foreground">
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span data-mock="true">24</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-comment"></i>
+                                            <span data-mock="true">8 replies</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-accent">
+                                            <i class="fas fa-share"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-card p-4 rounded-lg border border-border">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                                    <span class="text-secondary-foreground text-sm font-medium" data-mock="true">MK</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <h4 class="font-medium text-sm" data-mock="true">Manoj Kumar</h4>
+                                        <span class="text-xs text-muted-foreground">6h ago</span>
+                                    </div>
+                                    <p class="text-sm mb-2" data-mock="true">Government subsidy alert: 50% off on solar pumps till next month. Has anyone applied through the KrishiQuest portal?</p>
+                                    <div class="flex items-center space-x-4 text-xs text-muted-foreground">
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span data-mock="true">18</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-primary">
+                                            <i class="fas fa-comment"></i>
+                                            <span data-mock="true">3 replies</span>
+                                        </button>
+                                        <button class="flex items-center space-x-1 hover:text-accent">
+                                            <i class="fas fa-share"></i>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ask Question Button -->
+                    <button class="w-full bg-primary text-primary-foreground py-3 rounded-lg font-medium mt-6 flex items-center justify-center space-x-2">
+                        <i class="fas fa-plus"></i>
+                        <span>Ask a Question</span>
+                    </button>
+                </section>
+            </div>
+            <!-- @END_COMPONENT: CommunityTab -->
+        </main>
+        <!-- @END_COMPONENT: MainContent -->
+
+        <!-- @COMPONENT: BottomNavigation [Fixed bottom navigation] -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+            <div class="max-w-md mx-auto flex">
+                <button class="flex-1 py-3 flex flex-col items-center space-y-1 text-primary" data-nav="home">
+                    <i class="fas fa-home text-lg"></i>
+                    <span class="text-xs font-medium">Home</span>
+                </button>
+                <button class="flex-1 py-3 flex flex-col items-center space-y-1 text-muted-foreground" data-nav="progress">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <span class="text-xs font-medium">Progress</span>
+                </button>
+                <button class="flex-1 py-3 flex flex-col items-center space-y-1 text-muted-foreground" data-nav="camera">
+                    <i class="fas fa-camera text-lg"></i>
+                    <span class="text-xs font-medium">Scan</span>
+                </button>
+                <button class="flex-1 py-3 flex flex-col items-center space-y-1 text-muted-foreground" data-nav="profile">
+                    <i class="fas fa-user text-lg"></i>
+                    <span class="text-xs font-medium">Profile</span>
+                </button>
+            </div>
+        </nav>
+        <!-- @END_COMPONENT: BottomNavigation -->
+    </div>
+    <!-- @END_COMPONENT: AppContainer -->
+
+    <script>
+        // Tab Navigation functionality
+        (function() {
+            const tabButtons = document.querySelectorAll('.nav-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs
+                    tabButtons.forEach(tab => {
+                        tab.classList.remove('active');
+                        tab.classList.add('text-muted-foreground');
+                    });
+                    
+                    // Add active class to clicked tab
+                    button.classList.add('active');
+                    button.classList.remove('text-muted-foreground');
+                    
+                    // Hide all content
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show target content
+                    const targetContent = document.getElementById(targetTab + '-content');
+                    if (targetContent) {
+                        targetContent.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // Bottom navigation highlighting
+            const bottomNavButtons = document.querySelectorAll('[data-nav]');
+            bottomNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    bottomNavButtons.forEach(btn => {
+                        btn.classList.remove('text-primary');
+                        btn.classList.add('text-muted-foreground');
+                    });
+                    button.classList.add('text-primary');
+                    button.classList.remove('text-muted-foreground');
+                });
+            });
+        })();
+
+        // TODO: Implement quest completion logic, credit calculation, and equipment redemption functionality
+        // TODO: Add real-time progress tracking and achievement unlocking system
+        // TODO: Integrate with backend APIs for user data, course content, and community features
+        // TODO: Implement camera functionality for crop scanning and disease detection
+        // TODO: Add offline capability for rural areas with poor connectivity
+    </script>
+</body>
+</html>

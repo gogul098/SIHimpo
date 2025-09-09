@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Gamified Sustainable Farming Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://heroicons.com/icons"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                    colors: {
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                        popover: {
+                            DEFAULT: "var(--popover)",
+                            foreground: "var(--popover-foreground)",
+                        },
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        secondary: {
+                            DEFAULT: "var(--secondary)",
+                            foreground: "var(--secondary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                        },
+                        destructive: {
+                            DEFAULT: "var(--destructive)",
+                            foreground: "var(--destructive-foreground)",
+                        },
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "var(--font-sans)"],
+                    }
+                },
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(210 40% 8%);
+            --card: hsl(210 40% 100%);
+            --card-foreground: hsl(210 40% 15%);
+            --popover: hsl(210 40% 100%);
+            --popover-foreground: hsl(210 40% 3%);
+            --primary: hsl(142 76% 36%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(142 69% 31%);
+            --secondary-foreground: hsl(210 40% 98%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(210 40% 45%);
+            --accent: hsl(43 96% 56%);
+            --accent-foreground: hsl(210 40% 8%);
+            --destructive: hsl(0 85% 60%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(210 40% 90%);
+            --input: hsl(210 40% 89%);
+            --ring: hsl(142 76% 36%);
+            --radius: 8px;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .farming-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2322c55e' fill-opacity='0.05'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .progress-ring {
+            transition: stroke-dashoffset 0.3s ease;
+        }
+        
+        .pulse-glow {
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 8px var(--primary));
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans">
+    <!-- @COMPONENT: Header [Fixed navigation with branding and user profile] -->
+    <header class="fixed top-0 left-0 right-0 bg-card/95 backdrop-blur-md border-b border-border z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0 flex items-center">
+                        <!-- Krishi Quest Logo -->
+                        <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z"/>
+                                <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z"/>
+                            </svg>
+                        </div>
+                        <h1 class="ml-3 text-xl font-bold text-foreground">KrishiQuest</h1>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <nav class="hidden md:flex space-x-8 ml-8">
+                        <a href="#dashboard" class="text-primary font-medium border-b-2 border-primary pb-4">Dashboard</a>
+                        <a href="#farm" class="text-muted-foreground hover:text-foreground transition-colors pb-4">My Farm</a>
+                        <a href="#learn" class="text-muted-foreground hover:text-foreground transition-colors pb-4">Learning</a>
+                        <a href="#marketplace" class="text-muted-foreground hover:text-foreground transition-colors pb-4">Marketplace</a>
+                        <a href="#community" class="text-muted-foreground hover:text-foreground transition-colors pb-4">Community</a>
+                    </nav>
+                </div>
+                
+                <!-- User Profile & Credits -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 bg-accent/10 px-3 py-1 rounded-full">
+                        <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                        </svg>
+                        <span class="text-sm font-medium" data-bind="user.sustainaCredits">2,450</span>
+                        <span class="text-xs text-muted-foreground">Credits</span>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <!-- User Avatar -->
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium text-primary-foreground" data-bind="user.initials">RP</span>
+                        </div>
+                        <span class="text-sm font-medium hidden sm:block" data-bind="user.name">Ravi Patel</span>
+                        <svg class="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- @COMPONENT: HeroDashboard [Main dashboard with key stats and quick actions] -->
+        <section class="farming-pattern">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Welcome Section -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-foreground mb-2">Welcome back, <span data-bind="user.firstName">Ravi</span>! 🌱</h2>
+                    <p class="text-muted-foreground">Continue your sustainable farming journey and earn more Sustaina-Credits.</p>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Credits -->
+                    <div class="bg-card rounded-lg border border-border p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-muted-foreground">+120 today</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-foreground mb-1" data-bind="user.totalCredits">2,450</h3>
+                        <p class="text-sm text-muted-foreground">Sustaina-Credits</p>
+                    </div>
+                    
+                    <!-- Learning Progress -->
+                    <div class="bg-card rounded-lg border border-border p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-muted-foreground">3 completed</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-foreground mb-1" data-bind="user.learningProgress">78%</h3>
+                        <p class="text-sm text-muted-foreground">Course Completion</p>
+                    </div>
+                    
+                    <!-- Farm Level -->
+                    <div class="bg-card rounded-lg border border-border p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-muted-foreground">Level up soon!</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-foreground mb-1" data-bind="user.farmLevel">5</h3>
+                        <p class="text-sm text-muted-foreground">Farm Level</p>
+                    </div>
+                    
+                    <!-- Active Crops -->
+                    <div class="bg-card rounded-lg border border-border p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm text-muted-foreground pulse-glow">2 ready!</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-foreground mb-1" data-bind="user.activeCrops">7</h3>
+                        <p class="text-sm text-muted-foreground">Active Crops</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: HeroDashboard -->
+
+        <!-- @COMPONENT: QuickActions [Daily suggestions and quick access buttons] -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Daily Suggestions -->
+            <div class="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-6 mb-8 border border-primary/20">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-foreground flex items-center">
+                        <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Today's Smart Suggestions
+                    </h3>
+                    <span class="text-sm text-muted-foreground" data-bind="today.date">December 15, 2024</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Weather Alert -->
+                    <div class="bg-card rounded-lg p-4 border border-border">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"/>
+                            </svg>
+                            <span class="font-medium text-foreground">Weather Update</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-2">Moderate rain expected tomorrow. Perfect for your tomato seedlings!</p>
+                        <button class="text-xs bg-primary/10 text-primary px-2 py-1 rounded">Learn More</button>
+                    </div>
+                    
+                    <!-- Market Price -->
+                    <div class="bg-card rounded-lg p-4 border border-border">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-medium text-foreground">Market Alert</span>
+                    </div>
+                        <p class="text-sm text-muted-foreground mb-2">Spinach prices up 15%! Consider harvesting early.</p>
+                        <button class="text-xs bg-accent/10 text-accent px-2 py-1 rounded">View Markets</button>
+                    </div>
+                    
+                    <!-- Learning Reminder -->
+                    <div class="bg-card rounded-lg p-4 border border-border">
+                        <div class="flex items-center mb-2">
+                            <svg class="w-5 h-5 text-purple-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="font-medium text-foreground">Learning Streak</span>
+                        </div>
+                        <p class="text-sm text-muted-foreground mb-2">You're on a 7-day streak! Complete today's lesson to earn bonus credits.</p>
+                        <button class="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded">Continue Learning</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: QuickActions -->
+
+        <!-- @COMPONENT: MainContent [Primary content sections with virtual farm and learning modules] -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Virtual Farm Section -->
+                <div class="lg:col-span-2">
+                    <div class="bg-card rounded-xl border border-border overflow-hidden">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-semibold text-foreground flex items-center">
+                                    <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                    My Virtual Farm
+                                </h3>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    Manage Farm
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Farm Grid -->
+                        <div class="p-6">
+                            <!-- Simulated 3x3 farm grid with modern agricultural field appearance -->
+                            <div class="grid grid-cols-3 gap-3 mb-6">
+                                <!-- @MAP: farmPlots.map(plot => ( -->
+                                <!-- Plot 1 - Tomatoes Growing -->
+                                <div class="aspect-square bg-gradient-to-br from-green-100 to-green-200 border-2 border-green-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 transition-transform" data-implementation="Should open plot management modal">
+                                    <div class="absolute inset-0 bg-green-400/20"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <div class="bg-white/90 rounded p-1">
+                                            <p class="text-xs font-medium text-green-700" data-bind="plot.cropType">Tomatoes</p>
+                                            <div class="w-full bg-green-100 rounded-full h-1 mt-1">
+                                                <div class="bg-green-500 h-1 rounded-full" style="width: 75%" data-bind="plot.growthProgress"></div>
+                                            </div>
+                                            <p class="text-xs text-green-600 mt-1" data-bind="plot.daysLeft">5 days left</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-2 right-2">
+                                        <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Growing</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plot 2 - Spinach Ready -->
+                                <div class="aspect-square bg-gradient-to-br from-emerald-200 to-emerald-300 border-2 border-emerald-400 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 transition-transform pulse-glow">
+                                    <div class="absolute inset-0 bg-emerald-400/30"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <div class="bg-white/90 rounded p-1">
+                                            <p class="text-xs font-medium text-emerald-700" data-bind="plot.cropType">Spinach</p>
+                                            <div class="w-full bg-emerald-100 rounded-full h-1 mt-1">
+                                                <div class="bg-emerald-500 h-1 rounded-full w-full"></div>
+                                            </div>
+                                            <p class="text-xs text-emerald-600 mt-1 font-bold">Ready to harvest!</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-2 right-2">
+                                        <span class="bg-amber-500 text-white text-xs px-2 py-1 rounded-full">Ready</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plot 3 - Lettuce Ready -->
+                                <div class="aspect-square bg-gradient-to-br from-lime-200 to-lime-300 border-2 border-lime-400 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 transition-transform pulse-glow">
+                                    <div class="absolute inset-0 bg-lime-400/30"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <div class="bg-white/90 rounded p-1">
+                                            <p class="text-xs font-medium text-lime-700">Lettuce</p>
+                                            <div class="w-full bg-lime-100 rounded-full h-1 mt-1">
+                                                <div class="bg-lime-500 h-1 rounded-full w-full"></div>
+                                            </div>
+                                            <p class="text-xs text-lime-600 mt-1 font-bold">Ready to harvest!</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-2 right-2">
+                                        <span class="bg-amber-500 text-white text-xs px-2 py-1 rounded-full">Ready</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plot 4 - Carrots Seedling -->
+                                <div class="aspect-square bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 transition-transform">
+                                    <div class="absolute inset-0 bg-orange-100/50"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <div class="bg-white/90 rounded p-1">
+                                            <p class="text-xs font-medium text-orange-700">Carrots</p>
+                                            <div class="w-full bg-orange-100 rounded-full h-1 mt-1">
+                                                <div class="bg-orange-400 h-1 rounded-full" style="width: 25%"></div>
+                                            </div>
+                                            <p class="text-xs text-orange-600 mt-1">18 days left</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-2 right-2">
+                                        <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">Seedling</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plot 5 - Peppers Growing -->
+                                <div class="aspect-square bg-gradient-to-br from-red-100 to-red-200 border-2 border-red-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 transition-transform">
+                                    <div class="absolute inset-0 bg-red-300/20"></div>
+                                    <div class="absolute bottom-2 left-2 right-2">
+                                        <div class="bg-white/90 rounded p-1">
+                                            <p class="text-xs font-medium text-red-700">Peppers</p>
+                                            <div class="w-full bg-red-100 rounded-full h-1 mt-1">
+                                                <div class="bg-red-500 h-1 rounded-full" style="width: 60%"></div>
+                                            </div>
+                                            <p class="text-xs text-red-600 mt-1">8 days left</p>
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-2 right-2">
+                                        <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Growing</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Plot 6 - Empty -->
+                                <div class="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 hover:border-primary transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <svg class="w-8 h-8 text-gray-400 mx-auto mb-2 group-hover:text-primary transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <p class="text-xs text-gray-500 group-hover:text-primary transition-colors">Plant Crop</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Remaining empty plots -->
+                                <div class="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 hover:border-primary transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <svg class="w-8 h-8 text-gray-400 mx-auto mb-2 group-hover:text-primary transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <p class="text-xs text-gray-500 group-hover:text-primary transition-colors">Plant Crop</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 hover:border-primary transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <svg class="w-8 h-8 text-gray-400 mx-auto mb-2 group-hover:text-primary transition-colors" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                                            </svg>
+                                            <p class="text-xs text-gray-500 group-hover:text-primary transition-colors">Plant Crop</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-lg relative overflow-hidden cursor-pointer group hover:scale-105 hover:border-primary transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center">
+                                            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2">
+                                                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a4 4 0 00-2 7.5V15a1 1 0 11-2 0v-2.5A4 4 0 1111 5z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </div>
+                                            <p class="text-xs text-gray-500">Locked</p>
+                                            <p class="text-xs text-gray-400">Level 6</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                            
+                            <!-- Farm Actions -->
+                            <div class="flex space-x-3">
+                                <button class="flex-1 bg-primary/10 text-primary px-4 py-2 rounded-lg font-medium hover:bg-primary/20 transition-colors" data-event="click:harvestReady">
+                                    🌾 Harvest Ready Crops
+                                </button>
+                                <button class="flex-1 bg-accent/10 text-accent px-4 py-2 rounded-lg font-medium hover:bg-accent/20 transition-colors" data-event="click:waterCrops">
+                                    💧 Water All Crops
+                                </button>
+                                <button class="bg-secondary/10 text-secondary px-4 py-2 rounded-lg font-medium hover:bg-secondary/20 transition-colors" data-event="click:expandFarm">
+                                    ➕ Expand
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Learning Progress Sidebar -->
+                <div class="space-y-6">
+                    <!-- Current Learning Module -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center">
+                                <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                                </svg>
+                                Current Learning
+                            </h3>
+                            
+                            <!-- Course Card -->
+                            <div class="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg p-4 mb-4 border border-primary/20">
+                                <h4 class="font-medium text-foreground mb-2">Vertical Farming Basics</h4>
+                                <p class="text-sm text-muted-foreground mb-3">Learn how to maximize crop yield with minimal space using vertical farming techniques.</p>
+                                
+                                <!-- Progress Bar -->
+                                <div class="flex items-center mb-3">
+                                    <div class="flex-1 bg-muted rounded-full h-2 mr-3">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                    <span class="text-sm font-medium text-foreground">65%</span>
+                                </div>
+                                
+                                <!-- Next Lesson -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-muted-foreground">Lesson 4: LED Systems</span>
+                                    <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm hover:bg-primary/90 transition-colors">
+                                        Continue
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Credits Earned Today -->
+                            <div class="bg-accent/5 rounded-lg p-3 border border-accent/20">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-foreground">Credits earned today:</span>
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                        </svg>
+                                        <span class="font-semibold text-accent">+120</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Achievement Badges -->
+                    <div class="bg-card rounded-xl border border-border p-6">
+                        <h3 class="text-lg font-semibold text-foreground mb-4 flex items-center">
+                            <svg class="w-5 h-5 text-accent mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Recent Achievements
+                        </h3>
+                        
+                        <div class="space-y-3">
+                            <!-- Badge 1 -->
+                            <div class="flex items-center space-x-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-foreground">Green Thumb</p>
+                                    <p class="text-sm text-muted-foreground">Successfully harvested 10 crops</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Badge 2 -->
+                            <div class="flex items-center space-x-3 p-3 bg-secondary/5 rounded-lg border border-secondary/20">
+                                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-secondary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-foreground">Knowledge Seeker</p>
+                                    <p class="text-sm text-muted-foreground">Completed 5 learning modules</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Badge 3 -->
+                            <div class="flex items-center space-x-3 p-3 bg-accent/5 rounded-lg border border-accent/20">
+                                <div class="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-accent-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-foreground">Efficient Farmer</p>
+                                    <p class="text-sm text-muted-foreground">Reduced water usage by 50%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: MainContent -->
+
+        <!-- @COMPONENT: LearningAcademy [Comprehensive learning modules section] -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground mb-4">KrishiQuest Learning Academy</h2>
+                <p class="text-muted-foreground max-w-2xl">Master sustainable farming techniques through interactive courses, earn Sustaina-Credits, and unlock advanced farming methods.</p>
+            </div>
+            
+            <!-- Learning Path Progress -->
+            <div class="mb-8">
+                <div class="bg-card rounded-xl border border-border p-6">
+                    <h3 class="text-xl font-semibold text-foreground mb-4">Your Learning Journey</h3>
+                    <div class="flex items-center justify-between">
+                        <!-- Beginner -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-primary">Beginner</span>
+                            <span class="text-xs text-muted-foreground">Completed</span>
+                        </div>
+                        
+                        <!-- Progress Line -->
+                        <div class="flex-1 h-0.5 bg-primary mx-4"></div>
+                        
+                        <!-- Intermediate -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center mb-2">
+                                <div class="w-3 h-3 bg-accent-foreground rounded-full"></div>
+                            </div>
+                            <span class="text-sm font-medium text-accent">Intermediate</span>
+                            <span class="text-xs text-muted-foreground">In Progress</span>
+                        </div>
+                        
+                        <!-- Progress Line -->
+                        <div class="flex-1 h-0.5 bg-border mx-4"></div>
+                        
+                        <!-- Advanced -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-muted-foreground">Advanced</span>
+                            <span class="text-xs text-muted-foreground">Locked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Course Categories -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Course 1: Crop Selection -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <!-- Course header with farming scene background -->
+                    <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Smart Crop Selection</h3>
+                            <p class="text-green-100 text-sm">Choose the right crops for maximum profitability</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">8 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-primary/10 text-primary px-2 py-1 rounded text-sm font-medium">Intermediate</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">150 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Learn to analyze soil conditions, climate factors, and market demands to select high-yield, profitable crops.</p>
+                        
+                        <!-- Progress -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-1 bg-muted rounded-full h-2 mr-3">
+                                <div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <span class="text-sm font-medium text-foreground">6/8</span>
+                        </div>
+                        
+                        <button class="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                            Continue Learning
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Course 2: Soil Management -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-amber-400 to-orange-600 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Soil Health & Management</h3>
+                            <p class="text-orange-100 text-sm">Optimize soil for sustainable farming</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">6 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-secondary/10 text-secondary px-2 py-1 rounded text-sm font-medium">Beginner</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">200 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Master soil testing, pH management, organic composting, and nutrient optimization for healthier crops.</p>
+                        
+                        <!-- Progress -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-1 bg-muted rounded-full h-2 mr-3">
+                                <div class="bg-secondary h-2 rounded-full w-full"></div>
+                            </div>
+                            <span class="text-sm font-medium text-foreground">6/6</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-center py-2">
+                            <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-primary font-medium">Completed</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Course 3: Vertical Farming -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-blue-400 to-indigo-600 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Vertical Farming Systems</h3>
+                            <p class="text-blue-100 text-sm">Master space-efficient farming techniques</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">12 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-accent/10 text-accent px-2 py-1 rounded text-sm font-medium">Intermediate</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">300 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Learn hydroponic systems, LED lighting, climate control, and automated farming for urban agriculture.</p>
+                        
+                        <!-- Progress -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-1 bg-muted rounded-full h-2 mr-3">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 40%"></div>
+                            </div>
+                            <span class="text-sm font-medium text-foreground">5/12</span>
+                        </div>
+                        
+                        <button class="w-full bg-blue-500 text-white py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+                            Continue Learning
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Course 4: Market Analysis -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-purple-400 to-pink-600 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Agricultural Market Analysis</h3>
+                            <p class="text-purple-100 text-sm">Understand pricing and demand trends</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">10 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm font-medium">Advanced</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">250 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Analyze market trends, seasonal demands, pricing strategies, and develop profitable farming business plans.</p>
+                        
+                        <!-- Locked State -->
+                        <div class="flex items-center justify-center py-6">
+                            <div class="text-center">
+                                <svg class="w-8 h-8 text-muted-foreground mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                </svg>
+                                <p class="text-muted-foreground text-sm">Complete Vertical Farming to unlock</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Course 5: Equipment Usage -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-teal-400 to-cyan-600 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Modern Farm Equipment</h3>
+                            <p class="text-teal-100 text-sm">Master agricultural technology and tools</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">9 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-teal-100 text-teal-800 px-2 py-1 rounded text-sm font-medium">Beginner</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">180 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Learn to operate solar pumps, irrigation systems, seed planters, and harvesting equipment efficiently.</p>
+                        
+                        <!-- Progress -->
+                        <div class="flex items-center mb-4">
+                            <div class="flex-1 bg-muted rounded-full h-2 mr-3">
+                                <div class="bg-teal-500 h-2 rounded-full" style="width: 20%"></div>
+                            </div>
+                            <span class="text-sm font-medium text-foreground">2/9</span>
+                        </div>
+                        
+                        <button class="w-full bg-teal-500 text-white py-2 rounded-lg font-medium hover:bg-teal-600 transition-colors">
+                            Start Learning
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Course 6: Sustainable Practices -->
+                <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                    <div class="h-48 bg-gradient-to-br from-emerald-400 to-green-700 relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20 farming-pattern"></div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-lg font-semibold text-white mb-1">Sustainable Farming Practices</h3>
+                            <p class="text-emerald-100 text-sm">Eco-friendly and profitable farming methods</p>
+                        </div>
+                        <div class="absolute top-4 right-4">
+                            <div class="bg-white/20 backdrop-blur rounded-full px-2 py-1">
+                                <span class="text-xs text-white font-medium">11 Lessons</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">Intermediate</span>
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-sm font-medium text-foreground">320 Credits</span>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted-foreground text-sm mb-4">Master water conservation, organic pest control, renewable energy integration, and carbon footprint reduction.</p>
+                        
+                        <button class="w-full bg-emerald-600 text-white py-2 rounded-lg font-medium hover:bg-emerald-700 transition-colors">
+                            Enroll Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: LearningAcademy -->
+
+        <!-- @COMPONENT: Marketplace [Equipment marketplace with Sustaina-Credit redemption] -->
+        <section class="bg-muted/30 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-foreground mb-4">Equipment Marketplace</h2>
+                    <p class="text-muted-foreground max-w-2xl">Redeem your hard-earned Sustaina-Credits for premium farming equipment and get exclusive discounts on sustainable farming tools.</p>
+                </div>
+                
+                <!-- Credit Balance Banner -->
+                <div class="bg-gradient-to-r from-accent/20 to-primary/20 rounded-xl p-6 mb-8 border border-accent/30">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-semibold text-foreground mb-2">Your Sustaina-Credits Balance</h3>
+                            <div class="flex items-center">
+                                <svg class="w-8 h-8 text-accent mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                                <span class="text-3xl font-bold text-foreground" data-bind="user.sustainaCredits">2,450</span>
+                                <span class="text-muted-foreground ml-2">Credits Available</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-muted-foreground">Equivalent Value</p>
+                            <p class="text-lg font-semibold text-primary">₹12,250 in Discounts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Equipment Categories -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Solar Water Pump -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <!-- Equipment showcase image placeholder -->
+                        <div class="h-48 bg-gradient-to-br from-yellow-400 to-orange-500 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">25% OFF</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Solar Water Pump System</h3>
+                            <p class="text-muted-foreground text-sm mb-4">1HP solar-powered irrigation pump with smart controller and weather monitoring.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹45,000</span>
+                                    <span class="text-sm text-muted-foreground line-through ml-2">₹60,000</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">1,500 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors" data-event="click:redeemCredits">
+                                    Redeem Now
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vertical Farming Kit -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-green-400 to-emerald-600 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                            </svg>
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">NEW</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Complete Vertical Farm Setup</h3>
+                            <p class="text-muted-foreground text-sm mb-4">6-tier hydroponic system with LED grow lights, nutrient solution, and automation.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹85,000</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">2,800 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                                <p class="text-sm text-red-700">Insufficient credits. Need 350 more credits.</p>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-muted text-muted-foreground py-2 rounded-lg font-medium cursor-not-allowed" disabled>
+                                    Insufficient Credits
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Smart Irrigation System -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-blue-400 to-cyan-600 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.5 17a4.5 4.5 0 01-1.44-8.765 4.5 4.5 0 018.302-3.046 3.5 3.5 0 014.504 4.272A4 4 0 0115 17H5.5zm3.75-2.75a.75.75 0 001.5 0V9.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.1 0l-3.25 3.5a.75.75 0 101.1 1.02l1.95-2.1v4.59z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">15% OFF</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Smart Irrigation Controller</h3>
+                            <p class="text-muted-foreground text-sm mb-4">IoT-enabled drip irrigation system with soil moisture sensors and mobile app control.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹25,500</span>
+                                    <span class="text-sm text-muted-foreground line-through ml-2">₹30,000</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">900 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                    Redeem Now
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Soil Testing Kit -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-purple-400 to-indigo-600 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zm-3 6V6a1 1 0 112 0v3h1V6a1 1 0 112 0v3h1V6a1 1 0 112 0v3a1 1 0 01-1 1v4a2 2 0 11-4 0v-4H7v4a2 2 0 11-4 0v-4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Professional Soil Testing Kit</h3>
+                            <p class="text-muted-foreground text-sm mb-4">Digital pH meter, NPK sensor, and moisture tester with mobile app connectivity.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹8,500</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">300 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                    Redeem Now
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seed Varieties Pack -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-pink-400 to-rose-600 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-pink-500 text-white px-2 py-1 rounded text-xs font-medium">LIMITED</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Premium Seed Variety Pack</h3>
+                            <p class="text-muted-foreground text-sm mb-4">High-yield, disease-resistant seeds for lettuce, spinach, tomato, and herbs.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹1,200</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">50 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                    Redeem Now
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nutrient Solution Kit -->
+                    <div class="bg-card rounded-xl border border-border overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-amber-400 to-yellow-600 relative overflow-hidden flex items-center justify-center">
+                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-4 4C.817 14.769 2.156 18 4.828 18h10.343c2.673 0 4.012-3.231 2.122-5.121l-4-4A1 1 0 0113 8.172V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a1.993 1.993 0 00-.114-.035l1.063-1.063A3 3 0 009 8.172z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-foreground mb-2">Hydroponic Nutrient Solutions</h3>
+                            <p class="text-muted-foreground text-sm mb-4">Complete nutrient mix for hydroponic systems - vegetative and flowering formulas.</p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <span class="text-lg font-bold text-foreground">₹3,500</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-muted-foreground">Credits Required</p>
+                                    <p class="font-semibold text-accent">120 Credits</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                    Redeem Now
+                                </button>
+                                <button class="px-4 py-2 border border-border rounded-lg hover:bg-muted/50 transition-colors">
+                                    <svg class="w-5 h-5 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Redemption Guide -->
+                <div class="mt-12 bg-card rounded-xl border border-border p-8">
+                    <h3 class="text-xl font-semibold text-foreground mb-4">How to Redeem Your Sustaina-Credits</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-foreground mb-2">Learn & Complete</h4>
+                            <p class="text-sm text-muted-foreground">Complete learning modules and farm activities to earn credits</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2L3 7v11h4v-6h6v6h4V7l-7-5z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-foreground mb-2">Accumulate Credits</h4>
+                            <p class="text-sm text-muted-foreground">Watch your credit balance grow with each completed task</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-foreground mb-2">Choose Equipment</h4>
+                            <p class="text-sm text-muted-foreground">Browse and select the farming equipment you need</p>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <h4 class="font-semibold text-foreground mb-2">Redeem & Save</h4>
+                            <p class="text-sm text-muted-foreground">Use credits for discounts and enhance your sustainable farming journey</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: Marketplace -->
+
+        <!-- @COMPONENT: CommunitySection [Community features and farmer success stories] -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-foreground mb-4">Community & Success Stories</h2>
+                <p class="text-muted-foreground max-w-2xl">Connect with fellow farmers, share experiences, and learn from real success stories in sustainable farming.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Community Stats -->
+                <div class="lg:col-span-1">
+                    <div class="bg-card rounded-xl border border-border p-6 mb-6">
+                        <h3 class="text-xl font-semibold text-foreground mb-4">Community Stats</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-muted-foreground">Active Farmers</span>
+                                <span class="font-semibold text-foreground">12,540</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-muted-foreground">Success Stories</span>
+                                <span class="font-semibold text-foreground">2,890</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-muted-foreground">Credits Earned Today</span>
+                                <span class="font-semibold text-primary">45,670</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-muted-foreground">Equipment Redeemed</span>
+                                <span class="font-semibold text-accent">1,250</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Contributors -->
+                    <div class="bg-card rounded-xl border border-border p-6">
+                        <h3 class="text-lg font-semibold text-foreground mb-4">Top Contributors This Week</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-medium text-primary-foreground">MP</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-foreground">Mohan Patel</p>
+                                    <p class="text-xs text-muted-foreground">1,250 credits earned</p>
+                                </div>
+                                <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-medium text-secondary-foreground">AS</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-foreground">Anjali Singh</p>
+                                    <p class="text-xs text-muted-foreground">1,180 credits earned</p>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+                                    <span class="text-xs font-medium text-accent-foreground">VK</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-foreground">Vikram Kumar</p>
+                                    <p class="text-xs text-muted-foreground">950 credits earned</p>
+                                </div>
+                                <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success Stories -->
+                <div class="lg:col-span-2">
+                    <div class="space-y-6">
+                        <!-- Success Story 1 -->
+                        <div class="bg-card rounded-xl border border-border overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-sm font-medium text-primary-foreground">RM</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-semibold text-foreground">Rajesh Mehta</h4>
+                                            <span class="text-xs text-muted-foreground">2 days ago</span>
+                                        </div>
+                                        <p class="text-sm text-muted-foreground mb-3">Increased income by 300% with vertical farming</p>
+                                        <div class="bg-primary/5 rounded-lg p-4 mb-4">
+                                            <p class="text-sm text-foreground">"After completing the vertical farming course on KrishiQuest and redeeming credits for a hydroponic setup, my monthly income jumped from ₹15,000 to ₹45,000! The step-by-step learning modules made it so easy to understand."</p>
+                                        </div>
+                                        <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                                </svg>
+                                                45 likes
+                                            </span>
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                                </svg>
+                                                12 comments
+                                            </span>
+                                            <button class="flex items-center hover:text-primary transition-colors">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                                                </svg>
+                                                Share
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Success Story 2 -->
+                        <div class="bg-card rounded-xl border border-border overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-sm font-medium text-secondary-foreground">PS</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-semibold text-foreground">Priya Sharma</h4>
+                                            <span class="text-xs text-muted-foreground">4 days ago</span>
+                                        </div>
+                                        <p class="text-sm text-muted-foreground mb-3">Reduced water usage by 80% while doubling crop yield</p>
+                                        <div class="bg-secondary/5 rounded-lg p-4 mb-4">
+                                            <p class="text-sm text-foreground">"The smart irrigation course taught me how to optimize water usage. Using the drip irrigation system I got with my credits, I'm now using 80% less water and getting twice the yield! My water bills dropped from ₹8,000 to ₹1,500 per month."</p>
+                                        </div>
+                                        
+                                        <!-- Image placeholder for before/after comparison -->
+                                        <div class="grid grid-cols-2 gap-2 mb-4">
+                                            <div class="bg-red-100 rounded-lg p-3 text-center">
+                                                <p class="text-xs text-red-700 font-medium">Before: Traditional</p>
+                                                <p class="text-sm text-red-600">₹8,000/month water bill</p>
+                                            </div>
+                                            <div class="bg-green-100 rounded-lg p-3 text-center">
+                                                <p class="text-xs text-green-700 font-medium">After: Smart Irrigation</p>
+                                                <p class="text-sm text-green-600">₹1,500/month water bill</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                                </svg>
+                                                67 likes
+                                            </span>
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                                </svg>
+                                                18 comments
+                                            </span>
+                                            <button class="flex items-center hover:text-primary transition-colors">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                                                </svg>
+                                                Share
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Success Story 3 -->
+                        <div class="bg-card rounded-xl border border-border overflow-hidden">
+                            <div class="p-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
+                                        <span class="text-sm font-medium text-accent-foreground">AK</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-semibold text-foreground">Amit Kumar</h4>
+                                            <span class="text-xs text-muted-foreground">1 week ago</span>
+                                        </div>
+                                        <p class="text-sm text-muted-foreground mb-3">Started urban farming and now supplies to 5 restaurants</p>
+                                        <div class="bg-accent/5 rounded-lg p-4 mb-4">
+                                            <p class="text-sm text-foreground">"Living in Mumbai, I never thought I could farm. KrishiQuest's urban farming course changed everything! I set up a rooftop vertical farm and now supply fresh herbs to 5 local restaurants. Monthly profit: ₹35,000 from just 200 sq ft!"</p>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-4 text-sm text-muted-foreground">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                                </svg>
+                                                89 likes
+                                            </span>
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                                </svg>
+                                                24 comments
+                                            </span>
+                                            <button class="flex items-center hover:text-primary transition-colors">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/>
+                                                </svg>
+                                                Share
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Discussion Forums Preview -->
+                        <div class="bg-card rounded-xl border border-border p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-foreground">Active Discussions</h3>
+                                <button class="text-sm text-primary hover:text-primary/80 transition-colors">View All Forums</button>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3 p-3 hover:bg-muted/20 rounded-lg transition-colors cursor-pointer">
+                                    <div class="w-2 h-2 bg-primary rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-foreground">Best LED lights for indoor lettuce farming?</p>
+                                        <p class="text-xs text-muted-foreground">45 replies • Last activity 2 hours ago</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3 p-3 hover:bg-muted/20 rounded-lg transition-colors cursor-pointer">
+                                    <div class="w-2 h-2 bg-secondary rounded-full"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-foreground">Organic pest control methods that actually work</p>
+                                        <p class="text-xs text-muted-foreground">23 replies • Last activity 5 hours ago</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-3 p-3 hover:bg-muted/20 rounded-lg transition-colors cursor-pointer">
+                                    <div class="w-2 h-2 bg-accent rounded-full"></div>
+                                    <div class="flex-1"><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Gamified Agricultural Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                }
+            },
+            fontFamily: {
+                sans: ["Inter", "system-ui", "sans-serif"],
+            }
+        },
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(42 10% 98%);
+            --foreground: hsl(222 84% 5%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222 84% 5%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(222 84% 5%);
+            --primary: hsl(142 71% 45%);
+            --primary-foreground: hsl(355 100% 97%);
+            --secondary: hsl(30 54% 38%);
+            --secondary-foreground: hsl(355 100% 97%);
+            --muted: hsl(83 65% 45%);
+            --muted-foreground: hsl(215 16% 47%);
+            --accent: hsl(25 95% 53%);
+            --accent-foreground: hsl(355 100% 97%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(355 100% 97%);
+            --border: hsl(214 32% 91%);
+            --input: hsl(214 32% 91%);
+            --ring: hsl(142 71% 45%);
+            --radius: 12px;
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+        
+        .pulse-grow {
+            animation: pulse-grow 2s infinite;
+        }
+        
+        @keyframes pulse-grow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js" type="module"></script>
+</head>
+<body class="bg-background font-sans">
+    <!-- @COMPONENT: MobileHeader [sticky navigation with profile and notifications] -->
+    <header class="sticky top-0 z-50 bg-card border-b border-border px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold text-foreground">KrishiQuest</h1>
+                    <p class="text-xs text-muted-foreground" data-bind="user.location">Haryana, India</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center bg-accent/10 px-3 py-1 rounded-full">
+                    <svg class="w-4 h-4 text-accent mr-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-accent" data-bind="user.sustainaCredits">2,450</span>
+                </div>
+                
+                <button class="relative">
+                    <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h5a2 2 0 002-2v-1a2 2 0 00-2-2H4a2 2 0 00-2 2v1a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></div>
+                </button>
+                
+                <div class="w-8 h-8 rounded-full bg-muted overflow-hidden">
+                    <!-- Farmer avatar placeholder -->
+                    <img data-mock="true" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="Farmer profile" class="w-full h-full object-cover" />
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: MobileHeader -->
+
+    <!-- @COMPONENT: MainContainer [scrollable content area] -->
+    <main class="pb-20">
+        <!-- @COMPONENT: HeroSection [daily weather and quick stats] -->
+        <section class="px-4 py-6 bg-gradient-to-br from-primary/10 to-secondary/10">
+            <div class="bg-card rounded-xl p-4 shadow-sm border border-border">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold text-foreground">Good Morning, Farmer!</h2>
+                        <p class="text-sm text-muted-foreground">Today's farming conditions</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-foreground">28°C</div>
+                        <div class="text-xs text-muted-foreground">Partly Cloudy</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-sm font-medium text-accent">72%</div>
+                        <div class="text-xs text-muted-foreground">Humidity</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm font-medium text-primary">15 km/h</div>
+                        <div class="text-xs text-muted-foreground">Wind</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-sm font-medium text-secondary">UV 6</div>
+                        <div class="text-xs text-muted-foreground">Index</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-muted/20 rounded-lg">
+                    <p class="text-sm text-foreground">🌱 Perfect day for checking your vertical farm setup! Consider watering your leafy greens.</p>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: HeroSection -->
+
+        <!-- @COMPONENT: ProgressOverview [daily goals and streaks] -->
+        <section class="px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-foreground">Today's Progress</h3>
+                <span class="text-sm text-muted-foreground">🔥 7 day streak</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-card rounded-xl p-4 border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-muted-foreground">Learning Goals</span>
+                        <span class="text-sm font-medium text-primary">2/3</span>
+                    </div>
+                    <div class="w-full bg-border rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full progress-bar" style="width: 67%"></div>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-4 border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm text-muted-foreground">Farm Tasks</span>
+                        <span class="text-sm font-medium text-accent">1/2</span>
+                    </div>
+                    <div class="w-full bg-border rounded-full h-2">
+                        <div class="bg-accent h-2 rounded-full progress-bar" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: ProgressOverview -->
+
+        <!-- @COMPONENT: QuickActions [main navigation cards] -->
+        <section class="px-4 py-2">
+            <h3 class="text-lg font-semibold text-foreground mb-4">Quick Actions</h3>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <button class="bg-card rounded-xl p-6 border border-border hover-lift" data-event="click:navigateToFarm">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16l-3-9m3 9l3-9"></path>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-foreground mb-1">My Farm</h4>
+                        <p class="text-xs text-muted-foreground">Manage crops & plots</p>
+                    </div>
+                </button>
+                
+                <button class="bg-card rounded-xl p-6 border border-border hover-lift" data-event="click:navigateToLearning">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-foreground mb-1">Learn</h4>
+                        <p class="text-xs text-muted-foreground">Farming courses</p>
+                    </div>
+                </button>
+                
+                <button class="bg-card rounded-xl p-6 border border-border hover-lift" data-event="click:navigateToMarketplace">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-foreground mb-1">Shop</h4>
+                        <p class="text-xs text-muted-foreground">Equipment store</p>
+                    </div>
+                </button>
+                
+                <button class="bg-card rounded-xl p-6 border border-border hover-lift" data-event="click:navigateToCommunity">
+                    <div class="flex flex-col items-center text-center">
+                        <div class="w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="font-medium text-foreground mb-1">Community</h4>
+                        <p class="text-xs text-muted-foreground">Connect & learn</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: QuickActions -->
+
+        <!-- @COMPONENT: FeaturedLearning [current learning modules] -->
+        <section class="px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-foreground">Continue Learning</h3>
+                <button class="text-sm text-primary font-medium">View All</button>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- @MAP: currentLearningModules.map(module => ( -->
+                <div class="bg-card rounded-xl p-4 border border-border hover-lift" data-mock="true">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-medium text-foreground">Vertical Farming Basics</h4>
+                                <span class="text-xs bg-accent/10 text-accent px-2 py-1 rounded-full">+50 Credits</span>
+                            </div>
+                            <p class="text-sm text-muted-foreground mb-3">Learn about space-efficient growing techniques and LED lighting systems</p>
+                            <div class="flex items-center justify-between">
+                                <div class="w-full max-w-32 bg-border rounded-full h-2 mr-3">
+                                    <div class="bg-primary h-2 rounded-full progress-bar" style="width: 75%"></div>
+                                </div>
+                                <span class="text-xs text-muted-foreground">75%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-4 border border-border hover-lift" data-mock="true">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-16 h-16 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-medium text-foreground">Soil Health Management</h4>
+                                <span class="text-xs bg-accent/10 text-accent px-2 py-1 rounded-full">+75 Credits</span>
+                            </div>
+                            <p class="text-sm text-muted-foreground mb-3">Understanding NPK ratios and organic composting techniques</p>
+                            <div class="flex items-center justify-between">
+                                <div class="w-full max-w-32 bg-border rounded-full h-2 mr-3">
+                                    <div class="bg-primary h-2 rounded-full progress-bar" style="width: 30%"></div>
+                                </div>
+                                <span class="text-xs text-muted-foreground">30%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </section>
+        <!-- @END_COMPONENT: FeaturedLearning -->
+
+        <!-- @COMPONENT: VirtualFarmPreview [current farm status] -->
+        <section class="px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-foreground">My Virtual Farm</h3>
+                <button class="text-sm text-primary font-medium">Manage Farm</button>
+            </div>
+            
+            <div class="bg-card rounded-xl p-4 border border-border">
+                <!-- Mini farm visualization -->
+                <div class="bg-gradient-to-b from-muted/30 to-primary/20 rounded-lg p-4 mb-4">
+                    <div class="grid grid-cols-3 gap-2">
+                        <!-- @MAP: farmPlots.map(plot => ( -->
+                        <div class="bg-primary/20 rounded border-2 border-primary/40 p-2 text-center" data-mock="true">
+                            <div class="text-xs text-primary font-medium">Lettuce</div>
+                            <div class="text-xs text-muted-foreground">Day 15</div>
+                        </div>
+                        <div class="bg-accent/20 rounded border-2 border-accent/40 p-2 text-center" data-mock="true">
+                            <div class="text-xs text-accent font-medium">Tomato</div>
+                            <div class="text-xs text-muted-foreground">Day 8</div>
+                        </div>
+                        <div class="bg-border rounded border-2 border-dashed border-muted p-2 text-center" data-mock="true">
+                            <div class="text-xs text-muted-foreground">Empty</div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-lg font-semibold text-foreground">3</div>
+                        <div class="text-xs text-muted-foreground">Active Plots</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-semibold text-primary">₹1,250</div>
+                        <div class="text-xs text-muted-foreground">Est. Profit</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-semibold text-accent">92%</div>
+                        <div class="text-xs text-muted-foreground">Efficiency</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- @END_COMPONENT: VirtualFarmPreview -->
+
+        <!-- @COMPONENT: RecentAchievements [badges and rewards] -->
+        <section class="px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-foreground">Recent Achievements</h3>
+                <button class="text-sm text-primary font-medium">View All</button>
+            </div>
+            
+            <div class="flex space-x-4 overflow-x-auto pb-2">
+                <!-- @MAP: recentAchievements.map(achievement => ( -->
+                <div class="bg-card rounded-xl p-4 border border-border flex-shrink-0 w-32 text-center" data-mock="true">
+                    <div class="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-2 pulse-grow">
+                        <svg class="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-xs font-medium text-foreground">First Harvest</div>
+                    <div class="text-xs text-accent">+100 Credits</div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-4 border border-border flex-shrink-0 w-32 text-center" data-mock="true">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-6 h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-xs font-medium text-foreground">Quiz Master</div>
+                    <div class="text-xs text-primary">+50 Credits</div>
+                </div>
+                
+                <div class="bg-card rounded-xl p-4 border border-border flex-shrink-0 w-32 text-center" data-mock="true">
+                    <div class="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="text-xs font-medium text-foreground">Eco Warrior</div>
+                    <div class="text-xs text-secondary">+75 Credits</div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </section>
+        <!-- @END_COMPONENT: RecentAchievements -->
+
+        <!-- @COMPONENT: CommunityHighlights [social features preview] -->
+        <section class="px-4 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-foreground">Community Highlights</h3>
+                <button class="text-sm text-primary font-medium">Join Discussion</button>
+            </div>
+            
+            <div class="space-y-3">
+                <!-- @MAP: communityPosts.map(post => ( -->
+                <div class="bg-card rounded-xl p-4 border border-border" data-mock="true">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-muted overflow-hidden flex-shrink-0">
+                            <!-- Farmer avatar from rural community -->
+                            <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=40&h=40&fit=crop&crop=face" alt="Community member" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-1">
+                                <span class="text-sm font-medium text-foreground">Rajesh Kumar</span>
+                                <span class="text-xs text-muted-foreground">2h ago</span>
+                            </div>
+                            <p class="text-sm text-foreground mb-2">Just completed my first vertical farming setup! Increased my lettuce yield by 300%. Thanks to the KrishiQuest tutorials! 🌱</p>
+                            <div class="flex items-center space-x-4 text-xs text-muted-foreground">
+                                <button class="flex items-center space-x-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    <span>24</span>
+                                </button>
+                                <button class="flex items-center space-x-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    </svg>
+                                    <span>8</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </section>
+        <!-- @END_COMPONENT: CommunityHighlights -->
+    </main>
+    <!-- @END_COMPONENT: MainContainer -->
+
+    <!-- @COMPONENT: BottomNavigation [sticky tab navigation] -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-2">
+        <div class="flex items-center justify-around">
+            <button class="flex flex-col items-center space-y-1 py-2 px-3 rounded-lg bg-primary/10" data-event="click:navigateToHome">
+                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span class="text-xs text-primary font-medium">Home</span>
+            </button>
+            
+            <button class="flex flex-col items-center space-y-1 py-2 px-3" data-event="click:navigateToFarm">
+                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16l-3-9m3 9l3-9"></path>
+                </svg>
+                <span class="text-xs text-muted-foreground">Farm</span>
+            </button>
+            
+            <button class="flex flex-col items-center space-y-1 py-2 px-3" data-event="click:navigateToLearning">
+                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <span class="text-xs text-muted-foreground">Learn</span>
+            </button>
+            
+            <button class="flex flex-col items-center space-y-1 py-2 px-3" data-event="click:navigateToMarketplace">
+                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <span class="text-xs text-muted-foreground">Shop</span>
+            </button>
+            
+            <button class="flex flex-col items-center space-y-1 py-2 px-3" data-event="click:navigateToCommunity">
+                <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span class="text-xs text-muted-foreground">Community</span>
+            </button>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: BottomNavigation -->
+
+    <script>
+        (function() {
+            // TODO: Implement navigation handlers, state management, and API integrations
+            
+            // Simulate progress bar animations on load
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.progress-bar');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+            
+            // Add hover effects for interactive elements
+            const hoverElements = document.querySelectorAll('.hover-lift');
+            hoverElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '';
+                });
+            });
+            
+            // Simulate real-time credit updates
+            function updateCredits() {
+                const creditElement = document.querySelector('[data-bind="user.sustainaCredits"]');
+                if (creditElement) {
+                    let currentCredits = parseInt(creditElement.textContent.replace(',', ''));
+                    currentCredits += Math.floor(Math.random() * 10);
+                    creditElement.textContent = currentCredits.toLocaleString();
+                }
+            }
+            
+            // Update credits every 30 seconds to simulate activity
+            setInterval(updateCredits, 30000);
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiQuest - Farm Simulation Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)", 
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                    serif: ["var(--font-serif)"],
+                    mono: ["var(--font-mono)"],
+                },
+                animation: {
+                    'bounce-slow': 'bounce 3s infinite',
+                    'pulse-slow': 'pulse 4s infinite',
+                    'wiggle': 'wiggle 1s ease-in-out infinite',
+                },
+                keyframes: {
+                    wiggle: {
+                        '0%, 100%': { transform: 'rotate(-3deg)' },
+                        '50%': { transform: 'rotate(3deg)' },
+                    }
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(45 20% 95%);
+            --foreground: hsl(25 15% 15%);
+            --card: hsl(45 25% 98%);
+            --card-foreground: hsl(25 15% 15%);
+            --popover: hsl(45 25% 98%);
+            --popover-foreground: hsl(25 15% 15%);
+            --primary: hsl(100 40% 35%);
+            --primary-foreground: hsl(0 0% 98%);
+            --secondary: hsl(35 25% 85%);
+            --secondary-foreground: hsl(25 15% 25%);
+            --muted: hsl(45 15% 90%);
+            --muted-foreground: hsl(25 10% 45%);
+            --accent: hsl(200 80% 60%);
+            --accent-foreground: hsl(0 0% 98%);
+            --destructive: hsl(0 65% 55%);
+            --destructive-foreground: hsl(0 0% 98%);
+            --border: hsl(35 20% 80%);
+            --input: hsl(35 20% 85%);
+            --ring: hsl(100 40% 35%);
+            --radius: 12px;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        .crop-tile {
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .crop-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(139, 69, 19, 0.1) 0px,
+                rgba(139, 69, 19, 0.1) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+        }
+        
+        .planted-crop {
+            background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+        }
+        
+        .weather-sunny {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+        
+        .weather-rainy {
+            background: linear-gradient(135deg, #4682B4 0%, #87CEEB 100%);
+        }
+        
+        .achievement-glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            animation: pulse 2s infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-background text-foreground overflow-x-hidden">
+    <!-- @COMPONENT: AppHeader -->
+    <header class="bg-card border-b-2 border-border sticky top-0 z-50">
+        <div class="flex items-center justify-between p-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                    <i class="fas fa-seedling text-primary-foreground text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-foreground">KrishiQuest</h1>
+                    <p class="text-xs text-muted-foreground" data-mock="true">Level 12 Farmer</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Resource Display -->
+                <div class="flex items-center space-x-2 bg-secondary px-3 py-1 rounded-lg">
+                    <i class="fas fa-coins text-yellow-500"></i>
+                    <span class="font-semibold text-sm" data-bind="user.coins" data-mock="true">2,450</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-accent px-3 py-1 rounded-lg">
+                    <i class="fas fa-tint text-blue-500"></i>
+                    <span class="font-semibold text-sm text-accent-foreground" data-bind="user.water" data-mock="true">85%</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: AppHeader -->
+
+    <!-- @COMPONENT: WeatherWidget -->
+    <div class="weather-sunny p-4 text-center text-white font-semibold shadow-lg">
+        <div class="flex items-center justify-center space-x-3">
+            <i class="fas fa-sun text-2xl animate-bounce-slow"></i>
+            <div>
+                <p class="text-lg" data-mock="true">Sunny Day - Perfect for Planting!</p>
+                <p class="text-sm opacity-90" data-bind="weather.temp" data-mock="true">28°C • 65% Humidity</p>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: WeatherWidget -->
+
+    <!-- @COMPONENT: MainFarmGrid -->
+    <main class="p-4 pb-24">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold mb-2">Your Virtual Farm</h2>
+            <div class="bg-card p-4 rounded-lg border border-border">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-semibold">Farm Plot Status</h3>
+                    <button class="bg-primary text-primary-foreground px-3 py-1 rounded-lg text-sm font-medium">
+                        <i class="fas fa-plus mr-1"></i>Expand Farm
+                    </button>
+                </div>
+                
+                <!-- Farm Grid -->
+                <!-- @MAP: farmPlots.map(plot => ( -->
+                <div class="grid grid-cols-4 gap-2 mb-4">
+                    <!-- Plot 1: Empty Soil -->
+                    <div class="crop-tile aspect-square rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-105" data-event="click:plantCrop" data-implementation="Should open crop selection modal">
+                        <i class="fas fa-plus text-white text-xl opacity-70"></i>
+                    </div>
+                    
+                    <!-- Plot 2: Growing Tomatoes -->
+                    <div class="crop-tile planted-crop aspect-square rounded-lg flex items-center justify-center relative cursor-pointer">
+                        <i class="fas fa-seedling text-white text-xl animate-wiggle"></i>
+                        <div class="absolute -top-1 -right-1 bg-yellow-400 text-xs font-bold px-1 py-0.5 rounded-full text-black">3d</div>
+                    </div>
+                    
+                    <!-- Plot 3: Ready to Harvest -->
+                    <div class="crop-tile planted-crop aspect-square rounded-lg flex items-center justify-center relative cursor-pointer achievement-glow" data-event="click:harvestCrop">
+                        <i class="fas fa-apple-alt text-white text-xl"></i>
+                        <div class="absolute -top-1 -right-1 bg-green-400 text-xs font-bold px-1 py-0.5 rounded-full text-white">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Plot 4: Vertical Farming Setup -->
+                    <div class="crop-tile bg-gradient-to-br from-blue-600 to-cyan-500 aspect-square rounded-lg flex items-center justify-center cursor-pointer">
+                        <i class="fas fa-building text-white text-xl"></i>
+                    </div>
+                    
+                    <!-- Plot 5: Empty Soil -->
+                    <div class="crop-tile aspect-square rounded-lg flex items-center justify-center cursor-pointer transition-transform hover:scale-105">
+                        <i class="fas fa-plus text-white text-xl opacity-70"></i>
+                    </div>
+                    
+                    <!-- Plot 6: Growing Lettuce -->
+                    <div class="crop-tile planted-crop aspect-square rounded-lg flex items-center justify-center relative cursor-pointer">
+                        <i class="fas fa-leaf text-white text-xl animate-pulse-slow"></i>
+                        <div class="absolute -top-1 -right-1 bg-orange-400 text-xs font-bold px-1 py-0.5 rounded-full text-white">7d</div>
+                    </div>
+                    
+                    <!-- Plot 7: Solar Panel -->
+                    <div class="crop-tile bg-gradient-to-br from-yellow-500 to-orange-500 aspect-square rounded-lg flex items-center justify-center cursor-pointer">
+                        <i class="fas fa-solar-panel text-white text-xl"></i>
+                    </div>
+                    
+                    <!-- Plot 8: Composting Area -->
+                    <div class="crop-tile bg-gradient-to-br from-green-700 to-green-500 aspect-square rounded-lg flex items-center justify-center cursor-pointer">
+                        <i class="fas fa-recycle text-white text-xl animate-bounce-slow"></i>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+
+                <!-- Farm Stats -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-primary" data-bind="farm.totalCrops" data-mock="true">12</div>
+                        <div class="text-xs text-muted-foreground">Crops Growing</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-accent" data-bind="farm.sustainability" data-mock="true">85%</div>
+                        <div class="text-xs text-muted-foreground">Sustainability</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-yellow-600" data-bind="farm.dailyIncome" data-mock="true">₹450</div>
+                        <div class="text-xs text-muted-foreground">Daily Income</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- @COMPONENT: ProgressSection -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-3">Your Progress</h3>
+            <div class="space-y-4">
+                <!-- Crop Growth Progress -->
+                <div class="bg-card p-4 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium">🍅 Tomatoes</span>
+                        <span class="text-sm text-muted-foreground" data-mock="true">3 days left</span>
+                    </div>
+                    <div class="bg-muted rounded-full h-3 overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-400 to-green-600 h-full rounded-full transition-all duration-1000" style="width: 70%"></div>
+                    </div>
+                </div>
+                
+                <!-- Sustainability Score -->
+                <div class="bg-card p-4 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium">🌱 Sustainability Score</span>
+                        <span class="text-sm text-primary font-semibold" data-bind="user.sustainabilityScore" data-mock="true">85/100</span>
+                    </div>
+                    <div class="bg-muted rounded-full h-3 overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-400 to-green-500 h-full rounded-full transition-all duration-1000" style="width: 85%"></div>
+                    </div>
+                </div>
+
+                <!-- Farm Level -->
+                <div class="bg-card p-4 rounded-lg border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium">🏆 Farm Level</span>
+                        <span class="text-sm text-accent font-semibold" data-mock="true">Level 12</span>
+                    </div>
+                    <div class="bg-muted rounded-full h-3 overflow-hidden">
+                        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-full rounded-full transition-all duration-1000" style="width: 60%"></div>
+                    </div>
+                    <p class="text-xs text-muted-foreground mt-1" data-mock="true">2,400 / 4,000 XP to next level</p>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProgressSection -->
+
+        <!-- @COMPONENT: AchievementsSection -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-3">Recent Achievements</h3>
+            <div class="flex space-x-3 overflow-x-auto pb-2">
+                <!-- @MAP: achievements.map(achievement => ( -->
+                <div class="bg-card border border-border rounded-lg p-3 min-w-32 text-center achievement-glow">
+                    <div class="text-2xl mb-1">🏆</div>
+                    <div class="text-xs font-semibold" data-mock="true">Master Harvester</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">100 crops</div>
+                </div>
+                <div class="bg-card border border-border rounded-lg p-3 min-w-32 text-center">
+                    <div class="text-2xl mb-1">💧</div>
+                    <div class="text-xs font-semibold" data-mock="true">Water Saver</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">Save 1000L</div>
+                </div>
+                <div class="bg-card border border-border rounded-lg p-3 min-w-32 text-center">
+                    <div class="text-2xl mb-1">☀️</div>
+                    <div class="text-xs font-semibold" data-mock="true">Solar Pioneer</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">Use solar power</div>
+                </div>
+                <div class="bg-card border border-border rounded-lg p-3 min-w-32 text-center">
+                    <div class="text-2xl mb-1">🌿</div>
+                    <div class="text-xs font-semibold" data-mock="true">Eco Farmer</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">Zero pesticides</div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+        </div>
+        <!-- @END_COMPONENT: AchievementsSection -->
+
+        <!-- @COMPONENT: DailyChallenges -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-3">Daily Challenges</h3>
+            <div class="space-y-3">
+                <div class="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-seedling text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium" data-mock="true">Plant 5 new crops</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">Progress: 3/5</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-yellow-600" data-mock="true">+100 coins</div>
+                        <div class="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                            <div class="bg-primary h-full rounded-full" style="width: 60%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-tint text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium" data-mock="true">Save 50L water</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">Progress: 35/50L</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-semibold text-yellow-600" data-mock="true">+150 coins</div>
+                        <div class="w-16 h-2 bg-muted rounded-full overflow-hidden">
+                            <div class="bg-accent h-full rounded-full" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: DailyChallenges -->
+
+        <!-- @COMPONENT: MarketplacePreview -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-xl font-bold">Marketplace</h3>
+                <button class="text-primary font-medium text-sm">View All</button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-card border border-border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-lg">🍅</span>
+                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">High Demand</span>
+                    </div>
+                    <p class="font-medium" data-mock="true">Tomatoes</p>
+                    <p class="text-sm text-muted-foreground" data-mock="true">₹45/kg</p>
+                    <button class="w-full bg-primary text-primary-foreground rounded-lg py-2 text-sm font-medium mt-2" data-event="click:sellCrop">
+                        Sell Harvest
+                    </button>
+                </div>
+
+                <div class="bg-card border border-border rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-lg">🥬</span>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Stable</span>
+                    </div>
+                    <p class="font-medium" data-mock="true">Lettuce</p>
+                    <p class="text-sm text-muted-foreground" data-mock="true">₹35/kg</p>
+                    <button class="w-full bg-muted text-muted-foreground rounded-lg py-2 text-sm font-medium mt-2" disabled>
+                        Growing...
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: MarketplacePreview -->
+
+        <!-- @COMPONENT: EquipmentUpgrade -->
+        <div class="mb-6">
+            <h3 class="text-xl font-bold mb-3">Equipment Upgrades</h3>
+            <div class="bg-card border border-border rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-solar-panel text-2xl text-yellow-500"></i>
+                        <div>
+                            <p class="font-medium" data-mock="true">Solar Irrigation System</p>
+                            <p class="text-xs text-muted-foreground" data-mock="true">Reduces water usage by 40%</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-sm" data-mock="true">2,500 credits</p>
+                        <p class="text-xs text-green-600" data-mock="true">30% discount available</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex-1 bg-primary text-primary-foreground rounded-lg py-2 text-sm font-medium" data-event="click:upgradeEquipment">
+                        Upgrade Now
+                    </button>
+                    <button class="px-4 bg-secondary text-secondary-foreground rounded-lg py-2 text-sm font-medium">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: EquipmentUpgrade -->
+    </main>
+    <!-- @END_COMPONENT: MainFarmGrid -->
+
+    <!-- @COMPONENT: BottomNavigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+        <div class="flex justify-around py-2">
+            <button class="flex flex-col items-center py-2 px-4 text-primary" data-event="click:navigateToFarm">
+                <i class="fas fa-home text-lg mb-1"></i>
+                <span class="text-xs font-medium">Farm</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-muted-foreground" data-event="click:navigateToMarket">
+                <i class="fas fa-store text-lg mb-1"></i>
+                <span class="text-xs">Market</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-muted-foreground" data-event="click:navigateToLearning">
+                <i class="fas fa-book text-lg mb-1"></i>
+                <span class="text-xs">Learn</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-muted-foreground" data-event="click:navigateToSocial">
+                <i class="fas fa-users text-lg mb-1"></i>
+                <span class="text-xs">Social</span>
+            </button>
+            <button class="flex flex-col items-center py-2 px-4 text-muted-foreground" data-event="click:navigateToProfile">
+                <i class="fas fa-user text-lg mb-1"></i>
+                <span class="text-xs">Profile</span>
+            </button>
+        </div>
+    </nav>
+    <!-- @END_COMPONENT: BottomNavigation -->
+
+    <!-- @COMPONENT: CropPlantingModal [Hidden by default, shown when planting] -->
+    <div id="plantingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden" data-event="click:closePlantingModal">
+        <div class="bg-card rounded-lg p-6 m-4 max-w-sm w-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">Choose Crop to Plant</h3>
+                <button class="text-muted-foreground" data-event="click:closePlantingModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <!-- @MAP: availableCrops.map(crop => ( -->
+                <button class="bg-secondary rounded-lg p-3 text-center hover:bg-primary hover:text-primary-foreground transition-colors" data-event="click:selectCrop" data-crop-type="tomato">
+                    <div class="text-2xl mb-1">🍅</div>
+                    <div class="text-xs font-medium" data-mock="true">Tomato</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">7 days</div>
+                </button>
+                <button class="bg-secondary rounded-lg p-3 text-center hover:bg-primary hover:text-primary-foreground transition-colors" data-event="click:selectCrop" data-crop-type="lettuce">
+                    <div class="text-2xl mb-1">🥬</div>
+                    <div class="text-xs font-medium" data-mock="true">Lettuce</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">5 days</div>
+                </button>
+                <button class="bg-secondary rounded-lg p-3 text-center hover:bg-primary hover:text-primary-foreground transition-colors" data-event="click:selectCrop" data-crop-type="strawberry">
+                    <div class="text-2xl mb-1">🍓</div>
+                    <div class="text-xs font-medium" data-mock="true">Strawberry</div>
+                    <div class="text-xs text-muted-foreground" data-mock="true">14 days</div>
+                </button>
+                <!-- @END_MAP )) -->
+            </div>
+            <div class="flex space-x-3">
+                <button class="flex-1 bg-primary text-primary-foreground rounded-lg py-2 font-medium" data-event="click:confirmPlanting">
+                    Plant Selected
+                </button>
+                <button class="px-4 bg-secondary text-secondary-foreground rounded-lg py-2" data-event="click:closePlantingModal">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CropPlantingModal -->
+
+    <script>
+        // TODO: Implement complete farming simulation game logic
+        // TODO: Add real-time crop growth timers
+        // TODO: Implement weather system affecting crop yields
+        // TODO: Add resource management calculations
+        // TODO: Connect to backend API for user progress tracking
+        // TODO: Implement achievement unlocking system
+        // TODO: Add social features for visiting other farms
+        // TODO: Integrate marketplace with real-time pricing
+        // TODO: Add tutorial system for sustainable farming practices
+        // TODO: Implement equipment upgrade progression system
+        
+        (function() {
+            // Basic UI interactions for mockup demonstration
+            let selectedPlot = null;
+            
+            // Handle crop tile clicks for planting
+            document.querySelectorAll('.crop-tile').forEach(tile => {
+                tile.addEventListener('click', function() {
+                    if (this.querySelector('.fa-plus')) {
+                        selectedPlot = this;
+                        document.getElementById('plantingModal').classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // Handle modal interactions
+            document.addEventListener('click', function(e) {
+                if (e.target.dataset.event === 'closePlantingModal') {
+                    document.getElementById('plantingModal').classList.add('hidden');
+                }
+                
+                if (e.target.closest('[data-event="click:selectCrop"]')) {
+                    // TODO: Implement crop selection logic
+                    const cropType = e.target.closest('[data-event="click:selectCrop"]').dataset.cropType;
+                    console.log('Selected crop:', cropType);
+                }
+                
+                if (e.target.dataset.event === 'confirmPlanting') {
+                    // TODO: Implement actual planting logic
+                    if (selectedPlot) {
+                        selectedPlot.innerHTML = '<i class="fas fa-seedling text-white text-xl animate-wiggle"></i>';
+                        selectedPlot.classList.add('planted-crop');
+                        document.getElementById('plantingModal').classList.add('hidden');
+                    }
+                }
+                
+                if (e.target.dataset.event === 'click:harvestCrop') {
+                    // TODO: Implement harvesting rewards and crop removal
+                    console.log('Harvesting crop...');
+                }
+                
+                if (e.target.dataset.event === 'click:sellCrop') {
+                    // TODO: Implement marketplace selling logic
+                    console.log('Selling crop...');
+                }
+                
+                if (e.target.dataset.event === 'click:upgradeEquipment') {
+                    // TODO: Implement equipment upgrade system
+                    console.log('Upgrading equipment...');
+                }
+            });
+            
+            // Handle bottom navigation
+            document.querySelectorAll('nav button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('nav button').forEach(btn => {
+                        btn.classList.remove('text-primary');
+                        btn.classList.add('text-muted-foreground');
+                    });
+                    this.classList.remove('text-muted-foreground');
+                    this.classList.add('text-primary');
+                    // TODO: Implement actual navigation between app sections
+                });
+            });
+            
+            // Simulate crop growth progress updates
+            setInterval(() => {
+                // TODO: Update crop growth timers and progress bars
+                // This would normally connect to a real backend service
+            }, 60000); // Update every minute
+        })();
+    </script>
+</body>
+</html>
